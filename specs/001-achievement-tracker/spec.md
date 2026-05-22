@@ -92,6 +92,7 @@ A user connects their personal cloud storage account so that their data persists
 - **FR-009**: Users MUST be able to assign an optional category/tag to each entry for later filtering.
 - **FR-010**: System MUST handle the unauthenticated state gracefully — prompting connection before allowing data entry.
 - **FR-011**: When the OAuth session expires, the system MUST display an explicit "Session expired — Reconnect" prompt. The app MUST NOT attempt silent background re-authorisation.
+- **FR-012**: All interactive UI elements (buttons, inputs, form fields, cards, navigation) MUST be sourced from a single, widely-adopted component library to ensure a consistent visual language and accessible baseline behaviour across the application.
 
 ### Key Entities
 
@@ -115,5 +116,6 @@ A user connects their personal cloud storage account so that their data persists
 - The "digestible" view means a chronological list with a summary panel showing counts — not charts or graphs (those are a future enhancement).
 - Categories are free-text labels entered by the user; no predefined taxonomy is provided.
 - Mobile browser support is in scope; native mobile apps are out of scope.
+- All UI elements (buttons, forms, cards, typography) are sourced from an established, widely-adopted component library to ensure visual consistency and accessibility baseline. No custom-built base components are created where a library equivalent exists.
 - The application will be used by a single person at a time; no real-time sync or conflict resolution is required.
 - The user's connected storage account is already set up before using the application.
