@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { Entry } from '@/models/entry'
@@ -8,13 +8,18 @@ export default function EntryCard({ entry, onEdit }: { entry: Entry; onEdit?: ()
 
   return (
     <Card className="text-left">
-      <CardHeader>
+      <CardContent>
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-base">{title}</CardTitle>
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex-1 min-w-0">
+            <p className="text-base font-medium leading-snug">{title}</p>
+            {description && (
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap mt-1">{description}</p>
+            )}
+          </div>
+          <div className="flex flex-col items-end gap-1 shrink-0">
             <Badge
               variant={type === 'achievement' ? 'default' : 'destructive'}
-              className="shrink-0 capitalize"
+              className="capitalize"
             >
               {type}
             </Badge>
@@ -25,16 +30,11 @@ export default function EntryCard({ entry, onEdit }: { entry: Entry; onEdit?: ()
             )}
           </div>
         </div>
-        <div className="flex gap-2 text-xs text-muted-foreground">
+        <div className="flex gap-2 text-xs text-muted-foreground mt-3">
           <span>{date}</span>
           {category && <span>· {category}</span>}
         </div>
-      </CardHeader>
-      {description && (
-        <CardContent>
-          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{description}</p>
-        </CardContent>
-      )}
+      </CardContent>
     </Card>
   )
 }
