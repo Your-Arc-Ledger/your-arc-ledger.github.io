@@ -63,6 +63,32 @@ export async function appendEntry(
   }
 }
 
+export async function updateEntry(
+  spreadsheetId: string,
+  accessToken: string,
+  entry: Entry
+): Promise<void> {
+  const readUrl = `${BASE_URL}/${spreadsheetId}/values/${RANGE}`
+  const readRes = await fetch(readUrl, { headers: authHeaders(accessToken) })
+  if (!readRes.ok) throw new Error(`Sheets API error: ${readRes.status}`)
+  const data = await readRes.json() as { values?: string[][] }
+
+  const rowIndex = data.values?.findIndex((row) => row[0] === entry.id) ?? -1
+  if (rowIndex === -1) throw new Error('Entry not found in spreadsheet')
+
+  const sheetRow = rowIndex + 1
+  const range = `${SHEET_NAME}!A${sheetRow}:G${sheetRow}`
+  const row = [entry.id, entry.type, entry.title, entry.description, entry.category, entry.date, entry.createdAt]
+
+  const updateUrl = `${BASE_URL}/${spreadsheetId}/values/${range}?valueInputOption=RAW`
+  const updateRes = await fetch(updateUrl, {
+    method: 'PUT',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ values: [row] }),
+  })
+  if (!updateRes.ok) throw new Error(`Sheets API error: ${updateRes.status}`)
+}
+
 export async function initSheet(spreadsheetId: string, accessToken: string): Promise<void> {
   const metaUrl = `${BASE_URL}/${spreadsheetId}`
   const metaRes = await fetch(metaUrl, { headers: authHeaders(accessToken) })

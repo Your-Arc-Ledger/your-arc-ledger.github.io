@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
 import EntryList from '../../../src/components/entry/EntryList'
 import { EntriesProvider } from '../../../src/context/EntriesContext'
+import type { Entry } from '../../../src/models/entry'
 
 
 describe('EntryList', () => {
@@ -27,5 +28,19 @@ describe('EntryList', () => {
     const titles = screen.getAllByText(/First|Second/)
     expect(titles[0]).toHaveTextContent('Second')
     expect(titles[1]).toHaveTextContent('First')
+  })
+
+  it('calls onEdit with the entry when Edit button is clicked', () => {
+    const onEdit = vi.fn()
+    const items: Entry[] = [
+      { id: '1', type: 'achievement', title: 'Win', date: '2026-05-01', createdAt: '2026-05-01T10:00:00.000Z', description: '', category: '' },
+    ]
+    render(
+      <EntriesProvider>
+        <EntryList items={items} onEdit={onEdit} />
+      </EntriesProvider>
+    )
+    fireEvent.click(screen.getByRole('button', { name: /edit/i }))
+    expect(onEdit).toHaveBeenCalledWith(items[0])
   })
 })

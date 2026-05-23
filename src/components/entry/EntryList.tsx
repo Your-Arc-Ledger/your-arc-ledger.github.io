@@ -12,7 +12,7 @@ const FILTERS: { label: string; value: Filter }[] = [
   { label: 'Lessons', value: 'lesson' },
 ]
 
-export default function EntryList({ items: itemsProp }: { items?: Entry[] }) {
+export default function EntryList({ items: itemsProp, onEdit }: { items?: Entry[]; onEdit?: (entry: Entry) => void }) {
   const { state, dispatch } = useEntriesContext()
 
   const baseItems = itemsProp !== undefined ? itemsProp : state.items
@@ -66,7 +66,7 @@ export default function EntryList({ items: itemsProp }: { items?: Entry[] }) {
           <p className="text-sm mt-1">Log your first achievement or lesson above.</p>
         </div>
       ) : (
-        items.map((entry) => <EntryCard key={entry.id} entry={entry} />)
+        items.map((entry) => <EntryCard key={entry.id} entry={entry} onEdit={onEdit ? () => onEdit(entry) : undefined} />)
       )}
     </div>
   )

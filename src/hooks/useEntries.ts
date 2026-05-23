@@ -2,9 +2,9 @@ import { useEffect } from 'react'
 import { useEntriesContext } from '@/context/EntriesContext'
 import { useAuth } from '@/context/AuthContext'
 import { createEntry, validateEntry } from '@/models/entry'
-import { readEntries, appendEntry } from '@/services/googleSheets'
+import { readEntries, appendEntry, updateEntry as sheetsUpdateEntry } from '@/services/googleSheets'
 import { loadSheetRef } from '@/lib/storage'
-import type { EntryFields } from '@/models/entry'
+import type { Entry, EntryFields } from '@/models/entry'
 
 function mapApiError(status: number, spreadsheetId: string): string {
   if (status === 401) return 'Session expired — Reconnect'
@@ -61,11 +61,39 @@ export function useEntries() {
     }
   }
 
+  async function updateEntry(entry: Entry) {
+    const validation = validateEntry(entry)
+    if (!validation.valid) return
+
+    const accessToken = authState.accessToken
+    const spreadsheetId = loadSheetRef()?.id ?? null
+
+    if (!accessToken || !spreadsheetId) {
+      dispatch({ type: 'UPDATE_ENTRY', payload: entry })
+      return
+    }
+
+    dispatch({ type: 'SET_SAVING' })
+    try {
+      await sheetsUpdateEntry(spreadsheetId, accessToken, entry)
+      dispatch({ type: 'UPDATE_ENTRY', payload: entry })
+    } catch (err: unknown) {
+      let message = 'Failed to update entry. Please try again.'
+      if (err instanceof Response) {
+        message = mapApiError(err.status, spreadsheetId)
+      } else if (err instanceof Error) {
+        message = err.message
+      }
+      dispatch({ type: 'SET_ERROR', payload: message })
+    }
+  }
+
   return {
     entries: state.items,
     filter: state.filter,
     status: state.status,
     error: state.error,
     addEntry,
+    updateEntry,
   }
 }

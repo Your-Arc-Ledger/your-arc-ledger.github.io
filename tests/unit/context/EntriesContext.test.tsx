@@ -51,6 +51,24 @@ describe('EntriesContext filter reducer', () => {
     expect(result.current.state.filter).toBe('all')
   })
 
+  it('UPDATE_ENTRY replaces the matching item in place', () => {
+    const { result } = renderHook(() => useEntriesContext(), { wrapper })
+    const original = makeEntry({ title: 'Original' })
+    const other = makeEntry({ title: 'Other' })
+
+    act(() => {
+      result.current.dispatch({ type: 'SET_ENTRIES', payload: [original, other] })
+    })
+
+    const updated = { ...original, title: 'Updated' }
+    act(() => {
+      result.current.dispatch({ type: 'UPDATE_ENTRY', payload: updated })
+    })
+
+    expect(result.current.state.items.find((e) => e.id === original.id)?.title).toBe('Updated')
+    expect(result.current.state.items.find((e) => e.id === other.id)?.title).toBe('Other')
+  })
+
   it('master items array is never mutated by SET_FILTER', () => {
     const { result } = renderHook(() => useEntriesContext(), { wrapper })
     const items = [makeEntry({ type: 'achievement' }), makeEntry({ type: 'lesson' })]

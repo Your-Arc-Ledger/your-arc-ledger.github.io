@@ -12,6 +12,7 @@ type EntriesAction =
   | { type: 'SET_LOADING' }
   | { type: 'SET_ENTRIES'; payload: Entry[] }
   | { type: 'APPEND_ENTRY'; payload: Entry }
+  | { type: 'UPDATE_ENTRY'; payload: Entry }
   | { type: 'SET_FILTER'; payload: EntriesState['filter'] }
   | { type: 'SET_SAVING' }
   | { type: 'SET_ERROR'; payload: string }
@@ -34,6 +35,13 @@ function entriesReducer(state: EntriesState, action: EntriesAction): EntriesStat
         ...state,
         status: 'loaded',
         items: [action.payload, ...state.items],
+        error: null,
+      }
+    case 'UPDATE_ENTRY':
+      return {
+        ...state,
+        status: 'loaded',
+        items: state.items.map((item) => item.id === action.payload.id ? action.payload : item),
         error: null,
       }
     case 'SET_FILTER':

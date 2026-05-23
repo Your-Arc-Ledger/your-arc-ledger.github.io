@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { readEntries, appendEntry, initSheet } from '../../src/services/googleSheets'
+import { readEntries, appendEntry, initSheet, updateEntry } from '../../src/services/googleSheets'
 import type { Entry } from '../../src/models/entry'
 
 const SPREADSHEET_ID = 'test-spreadsheet-id'
@@ -134,6 +134,50 @@ describe('appendEntry', () => {
     expect(caughtError?.message).toMatch(/failed to save/i)
     expect(mockFetch).toHaveBeenCalledTimes(2)
     vi.useRealTimers()
+  })
+})
+
+describe('updateEntry', () => {
+  const entry: Entry = {
+    id: 'uuid-1',
+    type: 'lesson',
+    title: 'Updated title',
+    description: 'Updated desc',
+    category: 'Health',
+    date: '2026-05-24',
+    createdAt: '2026-05-23T10:00:00.000Z',
+  }
+
+  it('reads the sheet then PUTs the updated row at the correct range', async () => {
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ values: [HEADER_ROW, DATA_ROW] }),
+      })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+
+    vi.stubGlobal('fetch', mockFetch)
+
+    await updateEntry(SPREADSHEET_ID, ACCESS_TOKEN, entry)
+
+    expect(mockFetch).toHaveBeenCalledTimes(2)
+    const [putUrl, putOptions] = mockFetch.mock.calls[1]
+    expect(putUrl).toContain('A2:G2')
+    expect(putUrl).toContain('valueInputOption=RAW')
+    expect((putOptions as RequestInit).method).toBe('PUT')
+    const body = JSON.parse((putOptions as RequestInit).body as string)
+    expect(body.values[0]).toEqual([
+      entry.id, entry.type, entry.title, entry.description, entry.category, entry.date, entry.createdAt,
+    ])
+  })
+
+  it('throws when the entry id is not found in the sheet', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ values: [HEADER_ROW] }),
+    }))
+
+    await expect(updateEntry(SPREADSHEET_ID, ACCESS_TOKEN, entry)).rejects.toThrow(/not found/i)
   })
 })
 

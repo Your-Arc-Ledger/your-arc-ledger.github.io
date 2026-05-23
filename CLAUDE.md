@@ -32,7 +32,7 @@ Domain terms, data model types, state machine statuses, and architectural concep
 
 ## Testing conventions
 
-Test files live under `tests/unit/` mirroring the `src/` structure. Import paths in test files are relative to the test file's own location — e.g. a test at `tests/unit/components/auth/Foo.test.tsx` imports source as `../../../../src/...`, not `../../../src/...`.
+Test files live under `tests/unit/` mirroring the `src/` structure. Import paths in test files are relative to the test file's own location — e.g. a test at `tests/unit/components/auth/Foo.test.tsx` imports source as `../../../../src/...`, not `../../../src/...`. Use `import type` for type-only imports alongside component imports.
 
 ## Session Self-Evaluation
 

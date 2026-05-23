@@ -17,14 +17,21 @@ const today = () => new Date().toISOString().split('T')[0]
 
 type FormValues = EntryFields
 
-export default function EntryForm({ onSubmit }: { onSubmit: (fields: EntryFields) => void }) {
+interface EntryFormProps {
+  onSubmit: (fields: EntryFields) => void
+  initialValues?: Partial<EntryFields>
+  onCancel?: () => void
+  submitLabel?: string
+}
+
+export default function EntryForm({ onSubmit, initialValues, onCancel, submitLabel = 'Save Entry' }: EntryFormProps) {
   const form = useForm<FormValues>({
     defaultValues: {
-      type: 'achievement',
-      title: '',
-      description: '',
-      category: '',
-      date: today(),
+      type: initialValues?.type ?? 'achievement',
+      title: initialValues?.title ?? '',
+      description: initialValues?.description ?? '',
+      category: initialValues?.category ?? '',
+      date: initialValues?.date ?? today(),
     },
   })
 
@@ -34,7 +41,9 @@ export default function EntryForm({ onSubmit }: { onSubmit: (fields: EntryFields
       return
     }
     onSubmit(values)
-    form.reset({ ...form.getValues(), title: '', description: '', category: '', date: today() })
+    if (!onCancel) {
+      form.reset({ ...form.getValues(), title: '', description: '', category: '', date: today() })
+    }
   }
 
   return (
@@ -129,9 +138,16 @@ export default function EntryForm({ onSubmit }: { onSubmit: (fields: EntryFields
           )}
         />
 
-        <Button type="submit" className="w-full">
-          Save Entry
-        </Button>
+        <div className="flex gap-2">
+          {onCancel && (
+            <Button type="button" variant="outline" className="flex-1" onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
+          <Button type="submit" className={onCancel ? 'flex-1' : 'w-full'}>
+            {submitLabel}
+          </Button>
+        </div>
       </form>
     </Form>
   )
