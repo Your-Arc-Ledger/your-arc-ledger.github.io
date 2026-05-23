@@ -33,13 +33,13 @@ Single-project React SPA at repository root:
 
 **Purpose**: Bootstrap the Vite React project, configure tooling, and create the source directory skeleton.
 
-- [ ] T001 Bootstrap Vite React project: run `npm create vite@latest . -- --template react`; install dependencies with `npm install`; create the full `src/` directory hierarchy per plan.md (components/auth/, components/entry/, components/summary/, hooks/, services/, context/, models/)
-- [ ] T002 Install testing dependencies: `npm install --save-dev vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom`; create `tests/unit/` and `tests/integration/` directory structure
-- [ ] T003 [P] Configure Vitest in `vite.config.js`: add `test: { environment: 'jsdom', setupFiles: './src/test-setup.js' }` block; add `"test": "vitest"` and `"test:run": "vitest run"` scripts to `package.json`
-- [ ] T004 [P] Create `src/test-setup.js` that imports `@testing-library/jest-dom` so all test files get the extended matchers automatically
-- [ ] T005 [P] Configure ESLint and Prettier: install `eslint-config-prettier`, add Prettier config; verify `npm run lint` passes with zero errors on the generated scaffold
-- [ ] T006 [P] Create `.env.example` with `VITE_GOOGLE_CLIENT_ID=` placeholder; create `.env` with a blank value; confirm `.env` is listed in `.gitignore`
-- [ ] T007 Install `gh-pages` (`npm install --save-dev gh-pages`); add `"predeploy": "npm run build"` and `"deploy": "gh-pages -d dist"` scripts to `package.json`; set `base: '/achievement-diary/'` in `vite.config.js`
+- [X] T001 Bootstrap Vite React project: run `npm create vite@latest . -- --template react`; install dependencies with `npm install`; create the full `src/` directory hierarchy per plan.md (components/auth/, components/entry/, components/summary/, hooks/, services/, context/, models/)
+- [X] T002 Install testing dependencies: `npm install --save-dev vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom`; create `tests/unit/` and `tests/integration/` directory structure
+- [X] T003 [P] Configure Vitest in `vite.config.js`: add `test: { environment: 'jsdom', setupFiles: './src/test-setup.js' }` block; add `"test": "vitest"` and `"test:run": "vitest run"` scripts to `package.json`
+- [X] T004 [P] Create `src/test-setup.js` that imports `@testing-library/jest-dom` so all test files get the extended matchers automatically
+- [X] T005 [P] Configure ESLint and Prettier: install `eslint-config-prettier`, add Prettier config; verify `npm run lint` passes with zero errors on the generated scaffold
+- [X] T006 [P] Create `.env.example` with `VITE_GOOGLE_CLIENT_ID=` placeholder; create `.env` with a blank value; confirm `.env` is listed in `.gitignore`
+- [X] T007 Install `gh-pages` (`npm install --save-dev gh-pages`); add `"predeploy": "npm run build"` and `"deploy": "gh-pages -d dist"` scripts to `package.json`; set `base: '/achievement-diary/'` in `vite.config.js`
 
 ---
 
