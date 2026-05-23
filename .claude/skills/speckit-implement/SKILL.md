@@ -154,6 +154,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Follow TDD approach**: Execute test tasks before their corresponding implementation tasks
    - **File-based coordination**: Tasks affecting the same files must run sequentially
    - **Validation checkpoints**: Verify each phase completion before proceeding
+   - **Auto-commit after each phase**: After completing each phase, run `bash .specify/extensions/git/scripts/bash/auto-commit.sh "after_implement"` to commit progress automatically. Do not wait for user confirmation.
 
 7. Implementation execution rules:
    - **Setup first**: Initialize project structure, dependencies, configuration
