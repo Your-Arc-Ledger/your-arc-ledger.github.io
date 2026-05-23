@@ -112,3 +112,28 @@ describe('AuthGate — SpreadsheetPicker create path', () => {
     expect(screen.getByTestId('app-children')).toBeInTheDocument()
   })
 })
+
+describe('AuthGate — error state', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    vi.restoreAllMocks()
+  })
+
+  it('shows sheet title when a ref is stored', () => {
+    vi.spyOn(storage, 'loadSheetRef').mockReturnValue({ id: 'abc', title: 'My Worklog' })
+
+    renderAuthGate({ status: 'error', error: 'Session expired — Reconnect' })
+
+    expect(screen.getByText(/my worklog/i)).toBeInTheDocument()
+    expect(screen.getByText(/still connected/i)).toBeInTheDocument()
+  })
+
+  it('does not show sheet title line when no ref is stored', () => {
+    vi.spyOn(storage, 'loadSheetRef').mockReturnValue(null)
+
+    renderAuthGate({ status: 'error', error: 'Session expired — Reconnect' })
+
+    expect(screen.queryByText(/still connected/i)).not.toBeInTheDocument()
+    expect(screen.getByText(/session expired/i)).toBeInTheDocument()
+  })
+})
