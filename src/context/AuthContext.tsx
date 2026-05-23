@@ -1,4 +1,4 @@
-import { createContext, useReducer, useContext, ReactNode } from 'react'
+import { createContext, useReducer, useContext, type ReactNode, type Dispatch } from 'react'
 
 export interface AuthState {
   status: 'idle' | 'authorising' | 'authorised' | 'error'
@@ -33,7 +33,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
 
 interface AuthContextValue {
   state: AuthState
-  dispatch: React.Dispatch<AuthAction>
+  dispatch: Dispatch<AuthAction>
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)

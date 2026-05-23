@@ -1,4 +1,4 @@
-import { createContext, useReducer, useContext, ReactNode } from 'react'
+import { createContext, useReducer, useContext, type ReactNode, type Dispatch } from 'react'
 import type { Entry } from '@/models/entry'
 
 export interface EntriesState {
@@ -47,7 +47,7 @@ function entriesReducer(state: EntriesState, action: EntriesAction): EntriesStat
 
 interface EntriesContextValue {
   state: EntriesState
-  dispatch: React.Dispatch<EntriesAction>
+  dispatch: Dispatch<EntriesAction>
 }
 
 export const EntriesContext = createContext<EntriesContextValue | null>(null)

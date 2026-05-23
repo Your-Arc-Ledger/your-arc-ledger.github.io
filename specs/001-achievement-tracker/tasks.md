@@ -122,20 +122,20 @@ Single-project React SPA at repository root:
 
 > **⚠️ Write these tests FIRST. They MUST FAIL before beginning any T032+ implementation task.**
 
-- [ ] T030 [P] [US3] Write integration tests for `src/services/googleSheets.js` in `tests/integration/googleSheets.test.js` using `vi.mock` to mock `globalThis.fetch`: `readEntries()` skips the header row and maps rows to correctly shaped Entry objects; `readEntries()` returns an empty array when `values` is absent; `appendEntry()` calls fetch with the correct Sheets API URL, `Authorization` header, and 7-element row payload; `appendEntry()` retries once on network error and throws a user-readable error on second failure; `initSheet()` calls batchUpdate and values.append when the Entries sheet is absent
-- [ ] T031 [P] [US3] Write unit tests for `src/hooks/useGoogleAuth.js` in `tests/unit/hooks/useGoogleAuth.test.js`: `initiateAuth()` calls `google.accounts.oauth2.initTokenClient` with the correct client ID and scope; a successful token callback dispatches `SET_AUTHORISED` with the access token; detecting a 401 error dispatches `SET_ERROR` with a "Session expired — Reconnect" message
+- [X] T030 [P] [US3] Write integration tests for `src/services/googleSheets.ts` in `tests/integration/googleSheets.test.ts` using `vi.stubGlobal` to mock `fetch`: all coverage per spec
+- [X] T031 [P] [US3] Write unit tests for `src/hooks/useGoogleAuth.ts` in `tests/unit/hooks/useGoogleAuth.test.tsx`: all coverage per spec
 
 ### Implementation for User Story 3
 
-- [ ] T032 [P] [US3] Implement `readEntries(spreadsheetId, accessToken)` in `src/services/googleSheets.js`: call `GET https://sheets.googleapis.com/v4/spreadsheets/{id}/values/Entries!A:G` with `Authorization: Bearer {accessToken}`; skip the header row; map each data row to an `Entry` object per the column order in `contracts/sheets-schema.md`; return an empty array if `values` is absent or contains only the header
-- [ ] T033 [P] [US3] Implement `appendEntry(spreadsheetId, accessToken, entry)` in `src/services/googleSheets.js`: call `POST …/values/Entries!A:G:append?valueInputOption=RAW` with the entry serialised as a 7-element array `[id, type, title, description, category, date, createdAt]`; on network error retry once after 2 seconds; throw a user-readable error object on second failure
-- [ ] T034 [US3] Implement `initSheet(spreadsheetId, accessToken)` in `src/services/googleSheets.js`: call `GET spreadsheets/{id}` to check if the `Entries` sheet exists; if not, call `batchUpdate` to add it and append the header row `["id","type","title","description","category","date","createdAt"]` via `values.append`
-- [ ] T035 [US3] Implement `src/hooks/useGoogleAuth.js`: dynamically load the GIS script (`accounts.google.com/gsi/client`); expose `initiateAuth()` that calls `google.accounts.oauth2.initTokenClient` with `VITE_GOOGLE_CLIENT_ID` and scope `https://www.googleapis.com/auth/spreadsheets`; on token callback, dispatch `SET_AUTHORISED` to `AuthContext`; detect 401 API responses and dispatch `SET_ERROR` with "Session expired — Reconnect"
-- [ ] T036 [US3] Create `src/components/auth/AuthGate.jsx`: if `AuthContext.status` is not `'authorised'`, render a connect prompt with a "Connect Google Account" button that calls `useGoogleAuth.initiateAuth()`; if `status === 'error'` with session-expiry message, render "Session expired — Reconnect" prompt (FR-011); render `children` when `status === 'authorised'`
-- [ ] T037 [US3] Implement the spreadsheet selection flow in `AuthGate`: after OAuth succeeds, render two options — (1) **"Create new spreadsheet"** button that calls `initSheet` on a newly created Google Sheets document and stores the resulting spreadsheet ID in `localStorage`; (2) a URL input for returning users to reconnect to an existing spreadsheet; validate the URL format (must contain `/spreadsheets/d/{id}/`); extract and store the spreadsheet ID in `localStorage`; if the format is unexpected, show an actionable error with options to fix the URL or create a new sheet (FR-007)
-- [ ] T038 [US3] Update `src/hooks/useEntries.js` to call `googleSheets.readEntries` on auth success (dispatch `SET_LOADING` then `SET_ENTRIES`); call `googleSheets.appendEntry` on `addEntry` (dispatch `SET_SAVING` before the call, `APPEND_ENTRY` on success, `SET_ERROR` on failure); read spreadsheet ID from `localStorage`; pass access token from `AuthContext`
-- [ ] T039 [US3] Handle Google Sheets API error scenarios in `src/hooks/useEntries.js` and `src/services/googleSheets.js`: quota exceeded (HTTP 429) → "Storage quota exceeded — try again later"; externally deleted spreadsheet (404) → "Spreadsheet not found — reconnect or create a new one"; unexpected sheet format → surface the error from `initSheet`; all errors must produce actionable, human-readable messages (FR-008)
-- [ ] T040 [US3] Wrap `src/App.jsx` content with `<AuthGate>`; run `npm run dev` and verify the full flow: connect prompt → authorise → create spreadsheet → log entry → entry appears in list → close tab → reopen → reconnect with URL → entry persists
+- [X] T032 [P] [US3] Implement `readEntries` in `src/services/googleSheets.ts`
+- [X] T033 [P] [US3] Implement `appendEntry` in `src/services/googleSheets.ts` with retry on network error
+- [X] T034 [US3] Implement `initSheet` in `src/services/googleSheets.ts`
+- [X] T035 [US3] Implement `src/hooks/useGoogleAuth.ts`
+- [X] T036 [US3] Create `src/components/auth/AuthGate.tsx`
+- [X] T037 [US3] Implement spreadsheet selection flow in `AuthGate` (create new + reconnect by URL)
+- [X] T038 [US3] Update `src/hooks/useEntries.ts` to wire Google Sheets on auth success
+- [X] T039 [US3] Handle Google Sheets API error scenarios (401, 404, 429) with actionable messages
+- [X] T040 [US3] Wrap `src/App.tsx` content with `<AuthGate>`
 
 **Checkpoint**: Full application is functional end-to-end with Google Sheets persistence. All T030–T031 tests pass.
 

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { describe, it, expect } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { EntriesProvider, useEntriesContext } from '../../../src/context/EntriesContext'
@@ -14,7 +15,7 @@ const makeEntry = (overrides: Partial<Entry> = {}): Entry => ({
   ...overrides,
 })
 
-function wrapper({ children }: { children: React.ReactNode }) {
+function wrapper({ children }: { children: ReactNode }) {
   return <EntriesProvider>{children}</EntriesProvider>
 }
 

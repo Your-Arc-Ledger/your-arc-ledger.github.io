@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import EntrySummary from '../../../src/components/summary/EntrySummary'
@@ -20,7 +21,7 @@ function makeEntry(type: Entry['type'], date: string): Entry {
   }
 }
 
-function Wrapper({ children }: { children: React.ReactNode }) {
+function Wrapper({ children }: { children: ReactNode }) {
   return <EntriesProvider>{children}</EntriesProvider>
 }
 

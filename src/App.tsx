@@ -4,13 +4,14 @@ import { useEntries } from './hooks/useEntries'
 import EntryForm from './components/entry/EntryForm'
 import EntryList from './components/entry/EntryList'
 import EntrySummary from './components/summary/EntrySummary'
+import AuthGate from './components/auth/AuthGate'
 import type { EntryFields } from './models/entry'
 
 function AppContent() {
   const { addEntry } = useEntries()
 
   function handleSubmit(fields: EntryFields) {
-    addEntry(fields)
+    void addEntry(fields)
   }
 
   return (
@@ -35,7 +36,9 @@ export default function App() {
   return (
     <AuthProvider>
       <EntriesProvider>
-        <AppContent />
+        <AuthGate>
+          <AppContent />
+        </AuthGate>
       </EntriesProvider>
     </AuthProvider>
   )
