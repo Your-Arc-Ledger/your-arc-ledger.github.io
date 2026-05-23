@@ -105,7 +105,9 @@ At the end of each session, evaluate how well these instructions served the work
 - Did any instruction cause unnecessary friction or repeated tool calls?
 - Is the tech stack, source layout, or commands section still accurate?
 
-Present suggestions as specific proposed edits — not vague observations. The user decides whether to apply them.
+Present suggestions as specific proposed edits — not vague observations.
+
+**Committing self-improvement suggestions**: When a suggestion is a pure addition (new section, new rule, new convention — no existing text modified or removed) and you are certain it is correct and beneficial, apply the edit to CLAUDE.md and commit it immediately without asking. If the change modifies or removes any existing content, show the diff to the user and wait for approval before committing.
 
 
 ## Testing conventions
