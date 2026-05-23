@@ -20,4 +20,19 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // shadcn/ui generated components co-locate variants/utilities and may have unused React import (JSX transform)
+    files: ['src/components/ui/**/*.{js,jsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+      'no-unused-vars': 'off',
+    },
+  },
+  {
+    // Context files co-locate context, provider, and hook — standard React pattern
+    files: ['src/context/**/*.{js,jsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])

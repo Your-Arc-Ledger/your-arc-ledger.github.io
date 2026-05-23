@@ -49,11 +49,11 @@ Single-project React SPA at repository root:
 
 **⚠️ CRITICAL**: All Phase 3+ tasks depend on this phase being complete.
 
-- [ ] T008 Install and configure **shadcn/ui**: run `npx shadcn@latest init`; add Tailwind CSS; install the core components that will be used across the app (Button, Input, Textarea, Select, Card, Badge, Form, Label); verify components render in `src/App.jsx` with a smoke test
-- [ ] T009 Create `src/context/AuthContext.jsx`: define auth state shape (`status: 'idle'|'authorising'|'authorised'|'error'`, `accessToken: string|null`, `error: string|null`); implement `useReducer` with actions `SET_AUTHORISING`, `SET_AUTHORISED`, `SET_ERROR`, `CLEAR`; export `AuthContext` and `AuthProvider`
-- [ ] T010 Create `src/context/EntriesContext.jsx`: define entries state shape (`status: 'idle'|'loading'|'loaded'|'saving'|'error'`, `items: Entry[]`, `filter: 'all'|'achievement'|'setback'`, `error: string|null`); implement `useReducer` with actions `SET_LOADING`, `SET_ENTRIES`, `APPEND_ENTRY`, `SET_FILTER`, `SET_SAVING`, `SET_ERROR`; export `EntriesContext` and `EntriesProvider`
-- [ ] T011 [P] Create `src/models/entry.js`: export `createEntry(fields)` that generates `id` (UUID v4 via `crypto.randomUUID()`), sets `createdAt` to current ISO datetime, merges provided fields; export `validateEntry(entry)` that checks required fields and value constraints per data-model.md (blank title, invalid type, invalid date, field length limits)
-- [ ] T012 Update `src/App.jsx` to wrap the component tree in `<AuthProvider>` and `<EntriesProvider>`; render a placeholder `<main>` layout with slots for the auth gate, entry form, entry list, and summary panel
+- [X] T008 Install and configure **shadcn/ui**: run `npx shadcn@latest init`; add Tailwind CSS; install the core components that will be used across the app (Button, Input, Textarea, Select, Card, Badge, Form, Label); verify components render in `src/App.jsx` with a smoke test
+- [X] T009 Create `src/context/AuthContext.jsx`: define auth state shape (`status: 'idle'|'authorising'|'authorised'|'error'`, `accessToken: string|null`, `error: string|null`); implement `useReducer` with actions `SET_AUTHORISING`, `SET_AUTHORISED`, `SET_ERROR`, `CLEAR`; export `AuthContext` and `AuthProvider`
+- [X] T010 Create `src/context/EntriesContext.jsx`: define entries state shape (`status: 'idle'|'loading'|'loaded'|'saving'|'error'`, `items: Entry[]`, `filter: 'all'|'achievement'|'setback'`, `error: string|null`); implement `useReducer` with actions `SET_LOADING`, `SET_ENTRIES`, `APPEND_ENTRY`, `SET_FILTER`, `SET_SAVING`, `SET_ERROR`; export `EntriesContext` and `EntriesProvider`
+- [X] T011 [P] Create `src/models/entry.js`: export `createEntry(fields)` that generates `id` (UUID v4 via `crypto.randomUUID()`), sets `createdAt` to current ISO datetime, merges provided fields; export `validateEntry(entry)` that checks required fields and value constraints per data-model.md (blank title, invalid type, invalid date, field length limits)
+- [X] T012 Update `src/App.jsx` to wrap the component tree in `<AuthProvider>` and `<EntriesProvider>`; render a placeholder `<main>` layout with slots for the auth gate, entry form, entry list, and summary panel
 
 **Checkpoint**: State infrastructure is ready — user story components can now consume context hooks.
 
