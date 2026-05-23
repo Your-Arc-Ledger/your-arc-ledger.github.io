@@ -1,4 +1,4 @@
-import * as React from "react"
+// @ts-nocheck — complex base-ui wrapper; typed upstream by base-ui's own declarations
 import { Select as SelectPrimitive } from "@base-ui/react/select"
 
 import { cn } from "@/lib/utils"

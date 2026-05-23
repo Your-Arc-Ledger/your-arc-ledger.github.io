@@ -10,13 +10,13 @@ A single-user React web application deployed to GitHub Pages that lets users log
 
 ## Technical Context
 
-**Language/Version**: JavaScript (ES2022+) with React 18
+**Language/Version**: TypeScript (strict mode) with React 19
 
-**Primary Dependencies**: React 18, Vite (build tool), Google Identity Services (OAuth 2.0 implicit flow / token model), Google Sheets API v4, shadcn/ui (component library), Vitest, React Testing Library
+**Primary Dependencies**: React 19, Vite (build tool), Google Identity Services (OAuth 2.0 implicit flow / token model), Google Sheets API v4, shadcn/ui (component library), Vitest, React Testing Library
 
 **Storage**: Google Sheets document in the user's Google Drive (one sheet, columnar schema)
 
-**Testing**: Jest + React Testing Library (unit/component); Google Sheets API mocked via `vi.mock` / `jest.mock` for unit tests; manual integration test against a real test spreadsheet for the auth and persistence flows
+**Testing**: Vitest + React Testing Library (unit/component); Google Sheets API mocked via `vi.mock` for unit tests; manual integration test against a real test spreadsheet for the auth and persistence flows
 
 **Target Platform**: Static web app on GitHub Pages (modern browsers; Chrome 110+, Firefox 110+, Safari 16+); mobile browser support in scope
 

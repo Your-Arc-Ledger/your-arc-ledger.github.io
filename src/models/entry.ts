@@ -1,13 +1,44 @@
-export function createEntry(fields) {
+export interface Entry {
+  id: string
+  type: 'achievement' | 'setback'
+  title: string
+  description: string
+  category: string
+  date: string
+  createdAt: string
+}
+
+export type EntryFields = {
+  type: Entry['type']
+  title: string
+  date: string
+  description?: string
+  category?: string
+}
+
+export interface ValidationResult {
+  valid: true
+}
+
+export interface ValidationFailure {
+  valid: false
+  errors: Partial<Record<keyof EntryFields, string>>
+}
+
+export function createEntry(fields: EntryFields): Entry {
   return {
+    description: '',
+    category: '',
+    ...fields,
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
-    ...fields,
   }
 }
 
-export function validateEntry(entry) {
-  const errors = {}
+export function validateEntry(
+  entry: Partial<EntryFields>
+): ValidationResult | ValidationFailure {
+  const errors: Partial<Record<keyof EntryFields, string>> = {}
 
   if (!entry.title || entry.title.trim().length === 0) {
     errors.title = 'Title is required'
@@ -15,7 +46,7 @@ export function validateEntry(entry) {
     errors.title = 'Title must be 200 characters or fewer'
   }
 
-  if (!['achievement', 'setback'].includes(entry.type)) {
+  if (!entry.type || !['achievement', 'setback'].includes(entry.type)) {
     errors.type = 'Type must be achievement or setback'
   }
 

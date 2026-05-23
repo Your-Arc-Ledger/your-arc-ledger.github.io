@@ -3,11 +3,12 @@ import { EntriesProvider } from './context/EntriesContext'
 import { useEntries } from './hooks/useEntries'
 import EntryForm from './components/entry/EntryForm'
 import EntryList from './components/entry/EntryList'
+import type { EntryFields } from './models/entry'
 
 function AppContent() {
   const { addEntry } = useEntries()
 
-  function handleSubmit(fields) {
+  function handleSubmit(fields: EntryFields) {
     addEntry(fields)
   }
 

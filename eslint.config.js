@@ -3,34 +3,41 @@ import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import prettier from 'eslint-config-prettier'
+import tseslint from '@typescript-eslint/eslint-plugin'
+import tsParser from '@typescript-eslint/parser'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
   globalIgnores(['dist']),
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['**/*.{ts,tsx}'],
+    plugins: { '@typescript-eslint': tseslint },
+    languageOptions: {
+      parser: tsParser,
+      globals: globals.browser,
+      parserOptions: { ecmaFeatures: { jsx: true }, project: './tsconfig.json' },
+    },
     extends: [
       js.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
       prettier,
     ],
-    languageOptions: {
-      globals: globals.browser,
-      parserOptions: { ecmaFeatures: { jsx: true } },
+    rules: {
+      ...tseslint.configs.recommended.rules,
     },
   },
   {
-    // shadcn/ui generated components co-locate variants/utilities and may have unused React import (JSX transform)
-    files: ['src/components/ui/**/*.{js,jsx}'],
+    // shadcn/ui generated components
+    files: ['src/components/ui/**/*.{ts,tsx}'],
     rules: {
       'react-refresh/only-export-components': 'off',
-      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
     },
   },
   {
     // Context files co-locate context, provider, and hook — standard React pattern
-    files: ['src/context/**/*.{js,jsx}'],
+    files: ['src/context/**/*.{ts,tsx}'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },

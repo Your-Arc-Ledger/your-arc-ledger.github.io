@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import type { Entry } from '@/models/entry'
 
-export default function EntryCard({ entry }) {
+export default function EntryCard({ entry }: { entry: Entry }) {
   const { type, title, category, date, description } = entry
 
   return (

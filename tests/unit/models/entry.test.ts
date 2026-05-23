@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { createEntry, validateEntry } from '../../../src/models/entry.js'
+import { createEntry, validateEntry } from '../../../src/models/entry'
+import type { ValidationFailure } from '../../../src/models/entry'
+
+function fail(r: ReturnType<typeof validateEntry>): ValidationFailure {
+  expect(r.valid).toBe(false)
+  return r as ValidationFailure
+}
 
 describe('createEntry', () => {
   it('generates a UUID v4 id', () => {
@@ -18,7 +24,7 @@ describe('createEntry', () => {
   })
 
   it('merges provided fields', () => {
-    const fields = { type: 'setback', title: 'Missed goal', description: 'Desc', date: '2026-05-01' }
+    const fields = { type: 'setback' as const, title: 'Missed goal', description: 'Desc', date: '2026-05-01' }
     const entry = createEntry(fields)
     expect(entry.type).toBe('setback')
     expect(entry.title).toBe('Missed goal')
@@ -28,34 +34,28 @@ describe('createEntry', () => {
 })
 
 describe('validateEntry', () => {
-  const base = { type: 'achievement', title: 'Valid title', date: '2026-05-23' }
+  const base = { type: 'achievement' as const, title: 'Valid title', date: '2026-05-23' }
 
   it('returns valid for a complete valid entry', () => {
     expect(validateEntry(base).valid).toBe(true)
   })
 
   it('rejects blank title', () => {
-    const result = validateEntry({ ...base, title: '' })
-    expect(result.valid).toBe(false)
-    expect(result.errors.title).toBeDefined()
+    expect(fail(validateEntry({ ...base, title: '' })).errors.title).toBeDefined()
   })
 
   it('rejects whitespace-only title', () => {
-    const result = validateEntry({ ...base, title: '   ' })
-    expect(result.valid).toBe(false)
-    expect(result.errors.title).toBeDefined()
+    expect(fail(validateEntry({ ...base, title: '   ' })).errors.title).toBeDefined()
   })
 
   it('rejects title longer than 200 characters', () => {
-    const result = validateEntry({ ...base, title: 'a'.repeat(201) })
-    expect(result.valid).toBe(false)
-    expect(result.errors.title).toBeDefined()
+    expect(fail(validateEntry({ ...base, title: 'a'.repeat(201) })).errors.title).toBeDefined()
   })
 
   it('rejects invalid type values', () => {
-    const result = validateEntry({ ...base, type: 'win' })
-    expect(result.valid).toBe(false)
-    expect(result.errors.type).toBeDefined()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = validateEntry({ ...base, type: 'win' as any })
+    expect(fail(result).errors.type).toBeDefined()
   })
 
   it('accepts achievement and setback as valid types', () => {
@@ -64,20 +64,14 @@ describe('validateEntry', () => {
   })
 
   it('rejects description longer than 2000 characters', () => {
-    const result = validateEntry({ ...base, description: 'a'.repeat(2001) })
-    expect(result.valid).toBe(false)
-    expect(result.errors.description).toBeDefined()
+    expect(fail(validateEntry({ ...base, description: 'a'.repeat(2001) })).errors.description).toBeDefined()
   })
 
   it('rejects category longer than 50 characters', () => {
-    const result = validateEntry({ ...base, category: 'a'.repeat(51) })
-    expect(result.valid).toBe(false)
-    expect(result.errors.category).toBeDefined()
+    expect(fail(validateEntry({ ...base, category: 'a'.repeat(51) })).errors.category).toBeDefined()
   })
 
   it('rejects an invalid date string', () => {
-    const result = validateEntry({ ...base, date: 'not-a-date' })
-    expect(result.valid).toBe(false)
-    expect(result.errors.date).toBeDefined()
+    expect(fail(validateEntry({ ...base, date: 'not-a-date' })).errors.date).toBeDefined()
   })
 })

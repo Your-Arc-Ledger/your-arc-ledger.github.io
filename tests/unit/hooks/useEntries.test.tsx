@@ -1,9 +1,10 @@
+import React from 'react'
 import { describe, it, expect } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { EntriesProvider } from '../../../src/context/EntriesContext.jsx'
-import { useEntries } from '../../../src/hooks/useEntries.js'
+import { EntriesProvider } from '../../../src/context/EntriesContext'
+import { useEntries } from '../../../src/hooks/useEntries'
 
-function wrapper({ children }) {
+function wrapper({ children }: { children: React.ReactNode }) {
   return <EntriesProvider>{children}</EntriesProvider>
 }
 

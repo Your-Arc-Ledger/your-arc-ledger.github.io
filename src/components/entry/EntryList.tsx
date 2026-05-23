@@ -1,8 +1,9 @@
 import { useEntriesContext } from '@/context/EntriesContext'
 import EntryCard from './EntryCard'
 import { Button } from '@/components/ui/button'
+import type { Entry } from '@/models/entry'
 
-export default function EntryList({ items: itemsProp }) {
+export default function EntryList({ items: itemsProp }: { items?: Entry[] }) {
   const { state } = useEntriesContext()
 
   const items = itemsProp !== undefined

@@ -1,10 +1,11 @@
 import { useEntriesContext } from '@/context/EntriesContext'
 import { createEntry, validateEntry } from '@/models/entry'
+import type { EntryFields } from '@/models/entry'
 
 export function useEntries() {
   const { state, dispatch } = useEntriesContext()
 
-  function addEntry(fields) {
+  function addEntry(fields: EntryFields) {
     const validation = validateEntry(fields)
     if (!validation.valid) return
 

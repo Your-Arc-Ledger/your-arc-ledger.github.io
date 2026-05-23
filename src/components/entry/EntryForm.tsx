@@ -11,10 +11,14 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 
+import type { EntryFields } from '@/models/entry'
+
 const today = () => new Date().toISOString().split('T')[0]
 
-export default function EntryForm({ onSubmit }) {
-  const form = useForm({
+type FormValues = EntryFields
+
+export default function EntryForm({ onSubmit }: { onSubmit: (fields: EntryFields) => void }) {
+  const form = useForm<FormValues>({
     defaultValues: {
       type: 'achievement',
       title: '',
@@ -24,7 +28,7 @@ export default function EntryForm({ onSubmit }) {
     },
   })
 
-  function handleSubmit(values) {
+  function handleSubmit(values: FormValues) {
     if (!values.title || values.title.trim().length === 0) {
       form.setError('title', { message: 'Title is required' })
       return
@@ -63,7 +67,7 @@ export default function EntryForm({ onSubmit }) {
           name="title"
           rules={{
             required: 'Title is required',
-            validate: (v) => v.trim().length > 0 || 'Title is required',
+            validate: (v: string) => v.trim().length > 0 || 'Title is required',
             maxLength: { value: 200, message: 'Title must be 200 characters or fewer' },
           }}
           render={({ field }) => (
