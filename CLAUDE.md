@@ -62,6 +62,8 @@ Never include AI attribution in commit messages. Do not add `Co-Authored-By`, `G
 - **Testing**: Vitest + Testing Library (`tests/unit/`, `tests/integration/`)
 - **Deploy**: GitHub Pages (`npm run deploy`)
 
+**`Input` component quirk**: `src/components/ui/input.tsx` wraps `@base-ui/react/input`, not a native `<input>`. It does **not** forward all native HTML attributes — the `list` attribute for `<datalist>` is a known casualty. When a field needs a non-standard HTML attribute that the wrapper may not forward, use a native element (`<input>`, `<select>`, etc.) with explicit Tailwind classes instead of the `Input` wrapper.
+
 ## Commands
 
 | Task | Command |
@@ -75,6 +77,14 @@ Never include AI attribution in commit messages. Do not add `Co-Authored-By`, `G
 ## Source Layout
 
 `src/components/` — UI components; `src/hooks/` — custom hooks; `src/services/` — external API clients; `src/context/` — React context providers; `src/models/` — data types; `src/lib/` — utilities and storage helpers.
+
+## Design Conventions
+
+**Field cardinality must be decided before implementation.** Any field that could logically be "one or many" (a label, tag, category, priority, etc.) must be explicitly decided as `string` or `string[]` before writing any code. Changing cardinality after the fact requires updating the data model, Sheets serialisation, every UI component, and every test that constructs an `Entry` — a wide blast radius. If a request is ambiguous, ask.
+
+**Managed lookup options must be derived from two sources.** When a UI field offers a dropdown of managed values (e.g. categories), the option list must be the union of: (1) values stored in the Lookups sheet, and (2) values already present in loaded entries for that field. Relying on only the Lookups sheet leaves all pre-existing entry data invisible to the dropdown until manually re-entered.
+
+**`initSheet` must be called on every path that connects a spreadsheet.** This includes both "create new spreadsheet" and "connect existing spreadsheet" inside `AuthGate.tsx`. Any future auth flow that saves a `SheetRef` must also call `initSheet` so all required sheet tabs and headers are guaranteed to exist.
 
 ## Architecture
 
