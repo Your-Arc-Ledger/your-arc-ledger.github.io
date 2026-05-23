@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AuthProvider } from './context/AuthContext'
 import { EntriesProvider } from './context/EntriesContext'
 import { useEntries } from './hooks/useEntries'
@@ -11,6 +11,12 @@ import type { Entry, EntryFields } from './models/entry'
 function AppContent() {
   const { addEntry, updateEntry } = useEntries()
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null)
+  const formSectionRef = useRef<HTMLElement>(null)
+
+  function handleEdit(entry: Entry) {
+    setEditingEntry(entry)
+    setTimeout(() => formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+  }
 
   function handleSubmit(fields: EntryFields) {
     void addEntry(fields)
@@ -27,7 +33,7 @@ function AppContent() {
       <h1 className="text-2xl font-semibold">Arc</h1>
       <EntrySummary />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <section>
+        <section ref={formSectionRef}>
           <h2 className="text-lg font-medium mb-4">{editingEntry ? 'Edit Entry' : 'Log an Entry'}</h2>
           <div className={editingEntry ? 'hidden' : ''}>
             <EntryForm onSubmit={handleSubmit} />
@@ -43,7 +49,7 @@ function AppContent() {
         </section>
         <section>
           <h2 className="text-lg font-medium mb-4">Your Entries</h2>
-          <EntryList onEdit={setEditingEntry} />
+          <EntryList onEdit={handleEdit} />
         </section>
       </div>
     </main>
