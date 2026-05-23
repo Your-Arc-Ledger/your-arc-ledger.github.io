@@ -44,19 +44,13 @@ VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 
 > The Client ID is not a secret — it is safe to commit in `.env.example` but keep the actual `.env` out of git.
 
-## 4. Prepare the Google Sheet
+## 4. First-Time Setup: Google Sheet
 
-1. Create a new Google Sheets document in your Google Drive
-2. Rename the first sheet tab to exactly: `Entries`
-3. The app will write the header row automatically on first load, or you can add it manually:
-   - Row 1: `id | type | title | description | category | date | createdAt`
-4. Copy the spreadsheet ID from the URL:
-   `https://docs.google.com/spreadsheets/d/**{SPREADSHEET_ID}**/edit`
-5. Add to `.env`:
+The app manages your spreadsheet for you — no manual sheet creation needed.
 
-```
-VITE_SPREADSHEET_ID=your-spreadsheet-id
-```
+- **First-time users**: After connecting your Google account (step 5), click the **"Create new spreadsheet"** button in the app. The app creates a `Entries` sheet in your Drive automatically and stores the spreadsheet ID in your browser's local storage.
+- **Returning users**: After connecting, enter your existing spreadsheet URL in the app. The URL format is:
+  `https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit`
 
 ## 5. Run Locally
 
@@ -65,7 +59,7 @@ npm run dev
 # Open http://localhost:5173
 ```
 
-On first load, the app prompts you to connect your Google account. After authorising, it reads your `Entries` sheet and displays the entry list.
+On first load, the app prompts you to connect your Google account. After authorising, first-time users see a **"Create new spreadsheet"** button; returning users can enter their spreadsheet URL to reconnect.
 
 ## 6. Run Tests
 
@@ -131,11 +125,10 @@ jobs:
       - run: npm run build
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
-          VITE_SPREADSHEET_ID: ${{ secrets.VITE_SPREADSHEET_ID }}
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
 ```
 
-Add `VITE_GOOGLE_CLIENT_ID` and `VITE_SPREADSHEET_ID` as repository secrets in GitHub Settings → Secrets.
+Add `VITE_GOOGLE_CLIENT_ID` as a repository secret in GitHub Settings → Secrets. The spreadsheet ID is entered by the user at runtime — it is not a build-time secret.

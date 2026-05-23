@@ -12,7 +12,7 @@ A single-user React web application deployed to GitHub Pages that lets users log
 
 **Language/Version**: JavaScript (ES2022+) with React 18
 
-**Primary Dependencies**: React 18, Vite (build tool), Google Identity Services (OAuth 2.0 PKCE), Google Sheets API v4, React Testing Library, Jest
+**Primary Dependencies**: React 18, Vite (build tool), Google Identity Services (OAuth 2.0 implicit flow / token model), Google Sheets API v4, shadcn/ui (component library), Vitest, React Testing Library
 
 **Storage**: Google Sheets document in the user's Google Drive (one sheet, columnar schema)
 
@@ -24,8 +24,10 @@ A single-user React web application deployed to GitHub Pages that lets users log
 
 **Performance Goals**:
 - Initial page load (cold): ≤ 2 s on standard broadband (constitution default)
-- Entry list render after data loads: ≤ 1 s
+- Entry list render after data loads: ≤ 1 s *(render-only, after data has already arrived from the Sheets API — a subset of SC-002's 3 s end-to-end target)*
 - Save confirmation visible to user: ≤ 4 s (Google Sheets API write round-trip; see Constitution Check note)
+
+> **Performance targets verified in CI**: Lighthouse CI runs in the GitHub Actions workflow after build, enforcing the page load ≤ 2 s and list render ≤ 1 s targets. Regressions are blocking.
 
 **Constraints**:
 - GitHub Pages requires a fully static build — no Node.js server, no backend API
@@ -43,13 +45,13 @@ A single-user React web application deployed to GitHub Pages that lets users log
 |-----------|------|--------|-------|
 | I — Code Quality | Zero ESLint errors; single-responsibility components; no dead code | PASS | ESLint + Prettier configured at project init; Vite template enforces this |
 | I — Code Quality | Every abstraction beyond immediate task justified in PR | PASS | Plan and PR will carry Complexity Justification if needed |
-| II — Testing Standards | TDD (Red-Green-Refactor) enforced | PASS | RTL + Jest; failing tests written first per workflow |
-| II — Testing Standards | Unit tests for happy path and all edge cases | PASS | Google Sheets service layer fully mockable |
-| II — Testing Standards | Integration tests cover cross-boundary interactions | PASS | Auth flow and Sheets write/read covered by integration scenario (manual or automated against test sheet) |
+| II — Testing Standards | TDD (Red-Green-Refactor) enforced | PASS | Vitest + RTL; test tasks precede every implementation phase in tasks.md |
+| II — Testing Standards | Unit tests for happy path and all edge cases | PASS | Unit tests for models, components, hooks, and context reducer in tasks.md Phases 3–5 |
+| II — Testing Standards | Integration tests cover cross-boundary interactions | PASS | Automated integration tests for `googleSheets.js` (readEntries, appendEntry, initSheet) using `vi.mock` for fetch in tasks.md Phase 5 |
 | III — UX Consistency | Loading, empty, and error states for all flows | PASS | Required for: initial data load, save operation, auth flow, auth expiry |
 | III — UX Consistency | Human-readable, actionable error messages | PASS | All Google API errors mapped to user-friendly messages |
 | IV — Performance | Page load ≤ 2 s on standard connection | PASS | Static React build served from GitHub Pages CDN |
-| IV — Performance | Per-feature performance targets defined in plan.md | PASS | Defined above; save confirmation ≤ 4 s |
+| IV — Performance | Per-feature performance targets defined in plan.md | PASS | Defined above; save confirmation ≤ 4 s; Lighthouse CI enforces page load ≤ 2 s and list render ≤ 1 s in GitHub Actions (tasks.md T041) |
 | IV — Performance | API responses ≤ 200 ms p95 | N/A — see note | This project does not build a server API. The budget applies to APIs we serve; Google Sheets is an external third-party service. Save round-trip target is 4 s (user-visible); this is documented as an intentional relaxation due to external dependency, not a violation. |
 
 **Post-Phase-1 re-check**: Re-evaluate after data-model.md and contracts are defined. Specifically verify that the Sheets schema does not introduce additional latency (e.g., large spreadsheet scan on every read).

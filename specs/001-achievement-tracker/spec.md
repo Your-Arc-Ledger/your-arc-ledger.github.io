@@ -81,15 +81,15 @@ A user connects their personal cloud storage account so that their data persists
 
 ### Functional Requirements
 
-- **FR-001**: System MUST allow users to create entries with a type (achievement or setback), a title, a date, and an optional description.
+- **FR-001**: System MUST allow users to create entries with a type (achievement or setback), a title, a date, an optional description, and an optional category.
 - **FR-002**: System MUST display all entries in reverse-chronological order by default.
 - **FR-003**: System MUST visually distinguish achievement entries from setback entries.
 - **FR-004**: Users MUST be able to filter the entry list by type (all / achievements / setbacks).
 - **FR-005**: System MUST display a summary showing the count of achievements and setbacks recorded in the last 30 days.
 - **FR-006**: System MUST persist all entries to the user's connected storage so data survives page refreshes and browser restarts.
-- **FR-007**: System MUST allow users to connect their Google account via an authorisation flow. On first run, the app creates a new Google Sheets document automatically. Returning users MUST be able to supply an existing spreadsheet URL to reconnect to their previous data. If the target spreadsheet is in an unexpected format, the system MUST inform the user and offer options to fix or select a different spreadsheet.
+- **FR-007**: System MUST allow users to connect their Google account via an authorisation flow. On first run, the app prompts the user to create a new Google Sheets document via a single button click. Returning users MUST be able to supply an existing spreadsheet URL to reconnect to their previous data. If the target spreadsheet is in an unexpected format, the system MUST inform the user and offer options to fix or select a different spreadsheet.
 - **FR-008**: System MUST inform the user when a save fails and allow them to retry without losing their input. The pending entry MUST remain accessible in the form until the user successfully saves or explicitly discards it. If the tab is closed before a successful save, the entry is lost (no local persistence beyond the session).
-- **FR-009**: Users MUST be able to assign an optional category/tag to each entry for later filtering.
+- **FR-009**: Users MUST be able to assign an optional category to each entry for later filtering.
 - **FR-010**: System MUST handle the unauthenticated state gracefully — prompting connection before allowing data entry.
 - **FR-011**: When the OAuth session expires, the system MUST display an explicit "Session expired — Reconnect" prompt. The app MUST NOT attempt silent background re-authorisation.
 - **FR-012**: All interactive UI elements (buttons, inputs, form fields, cards, navigation) MUST be sourced from a single, widely-adopted component library to ensure a consistent visual language and accessible baseline behaviour across the application.
@@ -113,7 +113,7 @@ A user connects their personal cloud storage account so that their data persists
 
 - This is a single-user personal tool; there is no account system, login screen, or multi-user sharing.
 - Users have a modern web browser and a stable internet connection.
-- The "digestible" view means a chronological list with a summary panel showing counts — not charts or graphs (those are a future enhancement).
+- The "digestible" view means a reverse-chronological list (newest first) with a summary panel showing counts — not charts or graphs (those are a future enhancement).
 - Categories are free-text labels entered by the user; no predefined taxonomy is provided.
 - Mobile browser support is in scope; native mobile apps are out of scope.
 - All UI elements (buttons, forms, cards, typography) are sourced from an established, widely-adopted component library to ensure visual consistency and accessibility baseline. No custom-built base components are created where a library equivalent exists.
