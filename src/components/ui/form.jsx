@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Controller, FormProvider, useFormContext } from 'react-hook-form'
+import { Slot } from '@radix-ui/react-slot'
 import { cn } from '@/lib/utils'
 import { Label } from '@/components/ui/label'
 
@@ -69,17 +70,15 @@ const FormControl = React.forwardRef(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
   return (
-    <React.Fragment>
-      {React.cloneElement(props.children, {
-        ref,
-        id: formItemId,
-        'aria-describedby': !error
-          ? `${formDescriptionId}`
-          : `${formDescriptionId} ${formMessageId}`,
-        'aria-invalid': !!error,
-        ...props,
-      })}
-    </React.Fragment>
+    <Slot
+      ref={ref}
+      id={formItemId}
+      aria-describedby={
+        !error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`
+      }
+      aria-invalid={!!error}
+      {...props}
+    />
   )
 })
 FormControl.displayName = 'FormControl'
