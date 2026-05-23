@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
-  base: '/achievement-diary/',
+  base: '/arc/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
