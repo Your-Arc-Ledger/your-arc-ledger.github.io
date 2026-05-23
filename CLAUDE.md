@@ -1,9 +1,3 @@
-<!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan:
-specs/001-achievement-tracker/plan.md
-<!-- SPECKIT END -->
-
 ## Git commits
 
 Never include AI attribution in commit messages. Do not add `Co-Authored-By`, `Generated-by`, or any other trailer or note that identifies an AI tool as a contributor.
@@ -31,23 +25,6 @@ Never include AI attribution in commit messages. Do not add `Co-Authored-By`, `G
 ## Source Layout
 
 `src/components/` — UI components; `src/hooks/` — custom hooks; `src/services/` — external API clients; `src/context/` — React context providers; `src/models/` — data types.
-
-<!-- CONSTITUTION START -->
-<!--
-  Sync Impact Report
-  Version change: N/A → 1.0.0 (initial constitution)
-  Modified principles: N/A
-  Added sections: Core Principles (I–IV), Quality Gates, Development Workflow, Governance
-  Removed sections: N/A
-  Templates:
-    ✅ .specify/templates/plan-template.md — Constitution Check section is dynamic per-feature; aligns with v1.0.0 principles
-    ✅ .specify/templates/spec-template.md — Success Criteria and Requirements sections align with Performance and UX principles
-    ✅ .specify/templates/tasks-template.md — Phase structure and cross-cutting concerns align with Testing Standards and Code Quality
-    ✅ .specify/templates/checklist-template.md — No constitution-specific references; no changes required
-  Resolved:
-    - TECH_STACK: React 19 + TypeScript, Vite 8, Tailwind CSS 4, shadcn/ui, Vitest — documented in CLAUDE.md Tech Stack section
-    - COVERAGE_BASELINE: To be set after feature 001 ships; enforce via `vitest --coverage` threshold in vite.config.ts
--->
 
 # Arc Constitution
 
