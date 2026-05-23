@@ -1,14 +1,28 @@
 import { useEntriesContext } from '@/context/EntriesContext'
+import type { EntriesState } from '@/context/EntriesContext'
 import EntryCard from './EntryCard'
 import { Button } from '@/components/ui/button'
 import type { Entry } from '@/models/entry'
 
-export default function EntryList({ items: itemsProp }: { items?: Entry[] }) {
-  const { state } = useEntriesContext()
+type Filter = EntriesState['filter']
 
-  const items = itemsProp !== undefined
-    ? [...itemsProp].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    : [...state.items]
+const FILTERS: { label: string; value: Filter }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Achievements', value: 'achievement' },
+  { label: 'Setbacks', value: 'setback' },
+]
+
+export default function EntryList({ items: itemsProp }: { items?: Entry[] }) {
+  const { state, dispatch } = useEntriesContext()
+
+  const baseItems = itemsProp !== undefined ? itemsProp : state.items
+
+  const filtered =
+    state.filter === 'all'
+      ? baseItems
+      : baseItems.filter((e) => e.type === state.filter)
+
+  const items = [...filtered].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 
   if (state.status === 'loading') {
     return (
@@ -31,20 +45,29 @@ export default function EntryList({ items: itemsProp }: { items?: Entry[] }) {
     )
   }
 
-  if (items.length === 0) {
-    return (
-      <div className="text-center py-12 text-muted-foreground">
-        <p className="text-lg font-medium">No entries yet</p>
-        <p className="text-sm mt-1">Log your first achievement or setback above.</p>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-3">
-      {items.map((entry) => (
-        <EntryCard key={entry.id} entry={entry} />
-      ))}
+      <div className="flex gap-2">
+        {FILTERS.map(({ label, value }) => (
+          <Button
+            key={value}
+            variant={state.filter === value ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => dispatch({ type: 'SET_FILTER', payload: value })}
+          >
+            {label}
+          </Button>
+        ))}
+      </div>
+
+      {items.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          <p className="text-lg font-medium">No entries yet</p>
+          <p className="text-sm mt-1">Log your first achievement or setback above.</p>
+        </div>
+      ) : (
+        items.map((entry) => <EntryCard key={entry.id} entry={entry} />)
+      )}
     </div>
   )
 }

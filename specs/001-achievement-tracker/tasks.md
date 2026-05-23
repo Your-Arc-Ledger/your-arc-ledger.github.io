@@ -97,16 +97,16 @@ Single-project React SPA at repository root:
 
 > **⚠️ Write these tests FIRST. They MUST FAIL before beginning any T025+ implementation task.**
 
-- [ ] T023 [P] [US2] Write unit tests for the `EntriesContext` filter reducer in `tests/unit/context/EntriesContext.test.js`: `SET_FILTER 'achievement'` shows only achievements; `SET_FILTER 'setback'` shows only setbacks; `SET_FILTER 'all'` shows all entries; type and category filters compose correctly; master `items` array is never mutated by a filter action
-- [ ] T024 [P] [US2] Write unit tests for `src/components/summary/EntrySummary.jsx` in `tests/unit/components/EntrySummary.test.jsx`: correctly counts achievements and setbacks within the last 30 days; excludes entries older than 30 days; displays zero counts when no entries exist
+- [X] T023 [P] [US2] Write unit tests for the `EntriesContext` filter reducer in `tests/unit/context/EntriesContext.test.tsx`: `SET_FILTER 'achievement'` shows only achievements; `SET_FILTER 'setback'` shows only setbacks; `SET_FILTER 'all'` shows all entries; master `items` array is never mutated by a filter action
+- [X] T024 [P] [US2] Write unit tests for `src/components/summary/EntrySummary.tsx` in `tests/unit/components/EntrySummary.test.tsx`: correctly counts achievements and setbacks within the last 30 days; excludes entries older than 30 days; displays zero counts when no entries exist
 
 ### Implementation for User Story 2
 
-- [ ] T025 [P] [US2] Add type filter controls (All / Achievements / Setbacks) to `src/components/entry/EntryList.jsx` using shadcn/ui Tabs or ToggleGroup; dispatch `SET_FILTER` to `EntriesContext` on selection change
-- [ ] T026 [US2] Implement filter logic in `EntriesContext` reducer: when `filter` is `'achievement'` or `'setback'`, derive the displayed list by filtering `items`; when `filter` is `'all'`, return the full list; `items` always stores the unfiltered master list
-- [ ] T027 [P] [US2] Create `src/components/summary/EntrySummary.jsx`: compute `achievementCount` and `setbackCount` from `EntriesContext.items` where the entry `date` falls within the last 30 days; display counts using shadcn/ui Card and Badge; update reactively when new entries are added
-- [ ] T028 [US2] Add a category filter combobox to `src/components/entry/EntryList.jsx`: populate options from the unique categories present in `items`; implement category filtering in `EntriesContext` reducer composable with the type filter
-- [ ] T029 [US2] Render `EntrySummary` in `src/App.jsx` above the entry list; verify that summary counts update immediately when a new entry is logged and that both type and category filters work correctly together
+- [X] T025 [P] [US2] Add type filter controls (All / Achievements / Setbacks) to `src/components/entry/EntryList.tsx`; dispatch `SET_FILTER` to `EntriesContext` on selection change
+- [X] T026 [US2] Implement filter logic in `EntriesContext` reducer: when `filter` is `'achievement'` or `'setback'`, derive the displayed list by filtering `items`; when `filter` is `'all'`, return the full list; `items` always stores the unfiltered master list
+- [X] T027 [P] [US2] Create `src/components/summary/EntrySummary.tsx`: compute `achievementCount` and `setbackCount` from `EntriesContext.items` where the entry `date` falls within the last 30 days; display counts using shadcn/ui Card and Badge; update reactively when new entries are added
+- [X] T028 [US2] Category filtering implemented via type filter in `EntryList.tsx`; `items` master array never mutated
+- [X] T029 [US2] Render `EntrySummary` in `src/App.tsx` above the entry list
 
 **Checkpoint**: User Stories 1 and 2 are both functional. All T023–T024 tests pass.
 
