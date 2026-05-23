@@ -3,16 +3,8 @@ import { useEntriesContext } from '@/context/EntriesContext'
 import { useAuth } from '@/context/AuthContext'
 import { createEntry, validateEntry } from '@/models/entry'
 import { readEntries, appendEntry } from '@/services/googleSheets'
-import { SPREADSHEET_STORAGE_KEY as STORAGE_KEY } from '@/lib/constants'
+import { loadSheetRef } from '@/lib/storage'
 import type { EntryFields } from '@/models/entry'
-
-function getSpreadsheetId(): string | null {
-  try {
-    return localStorage.getItem(STORAGE_KEY)
-  } catch {
-    return null
-  }
-}
 
 function mapApiError(status: number, spreadsheetId: string): string {
   if (status === 401) return 'Session expired — Reconnect'
@@ -28,7 +20,7 @@ export function useEntries() {
   useEffect(() => {
     if (authState.status !== 'authorised' || !authState.accessToken) return
 
-    const spreadsheetId = getSpreadsheetId()
+    const spreadsheetId = loadSheetRef()?.id ?? null
     if (!spreadsheetId) return
 
     dispatch({ type: 'SET_LOADING' })
@@ -47,7 +39,7 @@ export function useEntries() {
 
     const entry = createEntry(fields)
     const accessToken = authState.accessToken
-    const spreadsheetId = getSpreadsheetId()
+    const spreadsheetId = loadSheetRef()?.id ?? null
 
     if (!accessToken || !spreadsheetId) {
       dispatch({ type: 'APPEND_ENTRY', payload: entry })
