@@ -4,7 +4,7 @@ import { useGoogleAuth } from '@/hooks/useGoogleAuth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { initSheet } from '@/services/googleSheets'
-import { SPREADSHEET_STORAGE_KEY as STORAGE_KEY } from '@/lib/constants'
+import { loadSheetRef, saveSheetRef } from '@/lib/storage'
 
 const SHEETS_URL_RE = /\/spreadsheets\/d\/([^/]+)/
 
@@ -22,6 +22,7 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
   const [url, setUrl] = useState('')
   const [urlError, setUrlError] = useState('')
   const [creating, setCreating] = useState(false)
+  const [connecting, setConnecting] = useState(false)
   const [initError, setInitError] = useState('')
 
   async function handleCreate() {
@@ -36,12 +37,16 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
         },
         body: JSON.stringify({ properties: { title: 'Arc' } }),
       })
-      const data = await res.json() as { spreadsheetId?: string; error?: { message: string } }
+      const data = await res.json() as {
+        spreadsheetId?: string
+        properties?: { title?: string }
+        error?: { message: string }
+      }
       if (!data.spreadsheetId) {
         throw new Error(data.error?.message ?? 'Could not create spreadsheet')
       }
       await initSheet(data.spreadsheetId, accessToken)
-      localStorage.setItem(STORAGE_KEY, data.spreadsheetId)
+      saveSheetRef({ id: data.spreadsheetId, title: data.properties?.title ?? 'Arc' })
       onSelected(data.spreadsheetId)
     } catch (e) {
       setInitError(e instanceof Error ? e.message : 'Failed to create spreadsheet')
@@ -50,7 +55,7 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
     }
   }
 
-  function handleConnect() {
+  async function handleConnect() {
     setUrlError('')
     const id = extractSpreadsheetId(url)
     if (!id) {
@@ -59,8 +64,21 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
       )
       return
     }
-    localStorage.setItem(STORAGE_KEY, id)
-    onSelected(id)
+    setConnecting(true)
+    try {
+      const res = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${id}?fields=properties.title`,
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      )
+      if (!res.ok) throw new Error(`Could not fetch spreadsheet (${res.status})`)
+      const meta = await res.json() as { properties?: { title?: string } }
+      saveSheetRef({ id, title: meta.properties?.title ?? 'your spreadsheet' })
+      onSelected(id)
+    } catch (e) {
+      setUrlError(e instanceof Error ? e.message : 'Failed to connect spreadsheet')
+    } finally {
+      setConnecting(false)
+    }
   }
 
   return (
@@ -81,8 +99,8 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
             value={url}
             onChange={(e) => setUrl(e.target.value)}
           />
-          <Button variant="outline" onClick={handleConnect}>
-            Connect
+          <Button variant="outline" onClick={handleConnect} disabled={connecting}>
+            {connecting ? 'Connecting…' : 'Connect'}
           </Button>
         </div>
         {urlError && <p className="text-sm text-destructive">{urlError}</p>}
@@ -95,7 +113,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
   const { state, dispatch } = useAuth()
   const { initiateAuth } = useGoogleAuth()
   const [spreadsheetId, setSpreadsheetId] = useState<string | null>(
-    () => localStorage.getItem(STORAGE_KEY)
+    () => loadSheetRef()?.id ?? null
   )
 
   if (state.status === 'authorised' && spreadsheetId) {
@@ -114,6 +132,8 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     )
   }
 
+  const sheetRef = state.status === 'error' ? loadSheetRef() : null
+
   return (
     <div className="max-w-md mx-auto mt-24 p-6 text-center space-y-4">
       <h2 className="text-xl font-semibold">Arc</h2>
@@ -121,6 +141,11 @@ export default function AuthGate({ children }: { children: ReactNode }) {
       {state.status === 'error' ? (
         <>
           <p className="text-destructive">{state.error}</p>
+          {sheetRef && (
+            <p className="text-muted-foreground">
+              Your spreadsheet &ldquo;{sheetRef.title}&rdquo; is still connected.
+            </p>
+          )}
           <Button
             onClick={() => {
               dispatch({ type: 'CLEAR' })
