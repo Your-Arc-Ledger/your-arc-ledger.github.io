@@ -54,7 +54,7 @@ export default function EntryForm({ onSubmit }: { onSubmit: (fields: EntryFields
                   {...field}
                 >
                   <option value="achievement">Achievement</option>
-                  <option value="setback">Setback</option>
+                  <option value="lesson">Lesson</option>
                 </select>
               </FormControl>
               <FormMessage />

@@ -1,6 +1,6 @@
 export interface Entry {
   id: string
-  type: 'achievement' | 'setback'
+  type: 'achievement' | 'lesson'
   title: string
   description: string
   category: string
@@ -46,8 +46,8 @@ export function validateEntry(
     errors.title = 'Title must be 200 characters or fewer'
   }
 
-  if (!entry.type || !['achievement', 'setback'].includes(entry.type)) {
-    errors.type = 'Type must be achievement or setback'
+  if (!entry.type || !['achievement', 'lesson'].includes(entry.type)) {
+    errors.type = 'Type must be achievement or lesson'
   }
 
   if (entry.description && entry.description.length > 2000) {

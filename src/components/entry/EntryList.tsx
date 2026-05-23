@@ -9,7 +9,7 @@ type Filter = EntriesState['filter']
 const FILTERS: { label: string; value: Filter }[] = [
   { label: 'All', value: 'all' },
   { label: 'Achievements', value: 'achievement' },
-  { label: 'Setbacks', value: 'setback' },
+  { label: 'Lessons', value: 'lesson' },
 ]
 
 export default function EntryList({ items: itemsProp }: { items?: Entry[] }) {
@@ -63,7 +63,7 @@ export default function EntryList({ items: itemsProp }: { items?: Entry[] }) {
       {items.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           <p className="text-lg font-medium">No entries yet</p>
-          <p className="text-sm mt-1">Log your first achievement or setback above.</p>
+          <p className="text-sm mt-1">Log your first achievement or lesson above.</p>
         </div>
       ) : (
         items.map((entry) => <EntryCard key={entry.id} entry={entry} />)

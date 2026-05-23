@@ -42,7 +42,7 @@ describe('EntryForm', () => {
     })
     const [fields] = onSubmit.mock.calls[0]
     expect(fields.title).toBe('My achievement')
-    expect(['achievement', 'setback']).toContain(fields.type)
+    expect(['achievement', 'lesson']).toContain(fields.type)
     expect(fields.date).toBeDefined()
   })
 })

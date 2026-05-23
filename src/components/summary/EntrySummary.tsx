@@ -13,7 +13,7 @@ export default function EntrySummary() {
 
   const recent = state.items.filter((e) => e.date >= cutoffStr)
   const achievementCount = recent.filter((e) => e.type === 'achievement').length
-  const setbackCount = recent.filter((e) => e.type === 'setback').length
+  const lessonCount = recent.filter((e) => e.type === 'lesson').length
 
   return (
     <Card>
@@ -29,8 +29,8 @@ export default function EntrySummary() {
             <span className="text-sm">Achievements</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="destructive">{setbackCount}</Badge>
-            <span className="text-sm">Setbacks</span>
+            <Badge variant="destructive">{lessonCount}</Badge>
+            <span className="text-sm">Lessons</span>
           </div>
         </div>
       </CardContent>

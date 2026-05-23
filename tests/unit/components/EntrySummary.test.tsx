@@ -33,10 +33,10 @@ describe('EntrySummary', () => {
       </EntriesProvider>
     )
     expect(screen.getByText(/achievements/i)).toBeInTheDocument()
-    expect(screen.getByText(/setbacks/i)).toBeInTheDocument()
+    expect(screen.getByText(/lessons/i)).toBeInTheDocument()
   })
 
-  it('correctly counts achievements and setbacks within the last 30 days', () => {
+  it('correctly counts achievements and lessons within the last 30 days', () => {
     const { result } = renderHook(() => useEntriesContext(), {
       wrapper: Wrapper,
     })
@@ -47,7 +47,7 @@ describe('EntrySummary', () => {
         payload: [
           makeEntry('achievement', today),
           makeEntry('achievement', today),
-          makeEntry('setback', today),
+          makeEntry('lesson', today),
           makeEntry('achievement', oldDate),
         ],
       })

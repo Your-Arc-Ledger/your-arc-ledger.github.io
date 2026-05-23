@@ -24,9 +24,9 @@ describe('createEntry', () => {
   })
 
   it('merges provided fields', () => {
-    const fields = { type: 'setback' as const, title: 'Missed goal', description: 'Desc', date: '2026-05-01' }
+    const fields = { type: 'lesson' as const, title: 'Missed goal', description: 'Desc', date: '2026-05-01' }
     const entry = createEntry(fields)
-    expect(entry.type).toBe('setback')
+    expect(entry.type).toBe('lesson')
     expect(entry.title).toBe('Missed goal')
     expect(entry.description).toBe('Desc')
     expect(entry.date).toBe('2026-05-01')
@@ -58,9 +58,9 @@ describe('validateEntry', () => {
     expect(fail(result).errors.type).toBeDefined()
   })
 
-  it('accepts achievement and setback as valid types', () => {
+  it('accepts achievement and lesson as valid types', () => {
     expect(validateEntry({ ...base, type: 'achievement' }).valid).toBe(true)
-    expect(validateEntry({ ...base, type: 'setback' }).valid).toBe(true)
+    expect(validateEntry({ ...base, type: 'lesson' }).valid).toBe(true)
   })
 
   it('rejects description longer than 2000 characters', () => {

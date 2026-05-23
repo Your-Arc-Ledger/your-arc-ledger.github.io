@@ -4,7 +4,7 @@ import type { Entry } from '@/models/entry'
 export interface EntriesState {
   status: 'idle' | 'loading' | 'loaded' | 'saving' | 'error'
   items: Entry[]
-  filter: 'all' | 'achievement' | 'setback'
+  filter: 'all' | 'achievement' | 'lesson'
   error: string | null
 }
 
