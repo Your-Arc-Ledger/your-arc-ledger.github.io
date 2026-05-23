@@ -19,6 +19,7 @@ function renderAuthGate(authState: Partial<AuthState>) {
   const state: AuthState = {
     status: 'idle',
     accessToken: null,
+    expiresAt: null,
     error: null,
     ...authState,
   }

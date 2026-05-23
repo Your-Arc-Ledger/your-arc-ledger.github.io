@@ -33,12 +33,14 @@ function makeWrapper(authState: AuthState) {
 const authorisedState: AuthState = {
   status: 'authorised',
   accessToken: ACCESS_TOKEN,
+  expiresAt: null,
   error: null,
 }
 
 const idleState: AuthState = {
   status: 'idle',
   accessToken: null,
+  expiresAt: null,
   error: null,
 }
 
