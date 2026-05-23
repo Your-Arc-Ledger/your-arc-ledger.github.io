@@ -35,7 +35,7 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ properties: { title: 'Arc' } }),
+        body: JSON.stringify({ properties: { title: 'Arc Ledger' } }),
       })
       if (!res.ok) throw new Error(`Could not create spreadsheet (${res.status})`)
       const data = await res.json() as {
@@ -47,7 +47,7 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
         throw new Error(data.error?.message ?? 'Could not create spreadsheet')
       }
       await initSheet(data.spreadsheetId, accessToken)
-      saveSheetRef({ id: data.spreadsheetId, title: data.properties?.title ?? 'Arc' })
+      saveSheetRef({ id: data.spreadsheetId, title: data.properties?.title ?? 'Arc Ledger' })
       onSelected(data.spreadsheetId)
     } catch (e) {
       setInitError(e instanceof Error ? e.message : 'Failed to create spreadsheet')
