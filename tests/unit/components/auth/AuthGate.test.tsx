@@ -41,10 +41,10 @@ describe('AuthGate — SpreadsheetPicker connect path', () => {
     const user = userEvent.setup()
     const saveSheetRef = vi.spyOn(storage, 'saveSheetRef')
 
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ properties: { title: 'My Worklog' } }),
-    } as Response)
+    } as Response))
 
     renderAuthGate({ status: 'authorised', accessToken: 'token123' })
 
@@ -63,10 +63,10 @@ describe('AuthGate — SpreadsheetPicker connect path', () => {
   it('shows error and does not navigate when title fetch fails', async () => {
     const user = userEvent.setup()
 
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({
       ok: false,
       status: 403,
-    } as Response)
+    } as Response))
 
     renderAuthGate({ status: 'authorised', accessToken: 'token123' })
 
@@ -93,14 +93,14 @@ describe('AuthGate — SpreadsheetPicker create path', () => {
     const user = userEvent.setup()
     const saveSheetRef = vi.spyOn(storage, 'saveSheetRef')
 
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({
       ok: true,
       json: () =>
         Promise.resolve({
           spreadsheetId: 'newid',
           properties: { title: 'Arc' },
         }),
-    } as Response)
+    } as Response))
 
     renderAuthGate({ status: 'authorised', accessToken: 'token123' })
 

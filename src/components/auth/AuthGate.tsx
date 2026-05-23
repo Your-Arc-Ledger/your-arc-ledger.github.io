@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useGoogleAuth } from '@/hooks/useGoogleAuth'
 import { Button } from '@/components/ui/button'
@@ -37,6 +37,7 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
         },
         body: JSON.stringify({ properties: { title: 'Arc' } }),
       })
+      if (!res.ok) throw new Error(`Could not create spreadsheet (${res.status})`)
       const data = await res.json() as {
         spreadsheetId?: string
         properties?: { title?: string }
@@ -116,6 +117,11 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     () => loadSheetRef()?.id ?? null
   )
 
+  const sheetRef = useMemo(
+    () => (state.status === 'error' ? loadSheetRef() : null),
+    [state.status]
+  )
+
   if (state.status === 'authorised' && spreadsheetId) {
     return <>{children}</>
   }
@@ -131,8 +137,6 @@ export default function AuthGate({ children }: { children: ReactNode }) {
       </div>
     )
   }
-
-  const sheetRef = state.status === 'error' ? loadSheetRef() : null
 
   return (
     <div className="max-w-md mx-auto mt-24 p-6 text-center space-y-4">
