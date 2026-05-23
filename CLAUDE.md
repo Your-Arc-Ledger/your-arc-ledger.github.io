@@ -26,6 +26,17 @@ Never include AI attribution in commit messages. Do not add `Co-Authored-By`, `G
 
 `src/components/` — UI components; `src/hooks/` — custom hooks; `src/services/` — external API clients; `src/context/` — React context providers; `src/models/` — data types.
 
+## Session Self-Evaluation
+
+At the end of each session, evaluate how well these instructions served the work and offer concrete suggestions for improvement. Specifically consider:
+
+- Were any instructions missing, ambiguous, or contradicted each other?
+- Did you need to discover something (a command, a file location, a convention) that should be documented here?
+- Did any instruction cause unnecessary friction or repeated tool calls?
+- Is the tech stack, source layout, or commands section still accurate?
+
+Present suggestions as specific proposed edits — not vague observations. The user decides whether to apply them.
+
 # Arc Constitution
 
 ## Core Principles
