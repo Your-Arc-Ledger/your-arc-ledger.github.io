@@ -1,4 +1,4 @@
-# Achievement Diary
+# Arc
 
 A personal achievement and setback tracker. Logs entries to a Google Sheet in your own Google Drive — no backend, fully static.
 

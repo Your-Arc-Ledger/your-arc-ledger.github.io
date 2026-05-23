@@ -1,1 +1,1 @@
-export const SPREADSHEET_STORAGE_KEY = 'achievement-diary-spreadsheet-id'
+export const SPREADSHEET_STORAGE_KEY = 'arc-spreadsheet-id'

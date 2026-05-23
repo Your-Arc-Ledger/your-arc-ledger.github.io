@@ -34,7 +34,7 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ properties: { title: 'Achievement Diary' } }),
+        body: JSON.stringify({ properties: { title: 'Arc' } }),
       })
       const data = await res.json() as { spreadsheetId?: string; error?: { message: string } }
       if (!data.spreadsheetId) {
@@ -116,7 +116,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
 
   return (
     <div className="max-w-md mx-auto mt-24 p-6 text-center space-y-4">
-      <h2 className="text-xl font-semibold">Achievement Diary</h2>
+      <h2 className="text-xl font-semibold">Arc</h2>
 
       {state.status === 'error' ? (
         <>
