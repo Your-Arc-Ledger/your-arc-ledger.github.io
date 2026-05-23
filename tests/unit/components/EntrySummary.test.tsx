@@ -15,7 +15,7 @@ function makeEntry(type: Entry['type'], date: string): Entry {
     type,
     title: 'Entry',
     description: '',
-    category: '',
+    categories: [],
     date,
     createdAt: new Date().toISOString(),
   }

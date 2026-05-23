@@ -23,7 +23,7 @@ describe('useEntries', () => {
         title: 'First entry',
         date: '2026-05-23',
         description: '',
-        category: '',
+        categories: [],
       })
     })
 

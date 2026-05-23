@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import type { Entry } from '@/models/entry'
 
 export default function EntryCard({ entry, onEdit }: { entry: Entry; onEdit?: () => void }) {
-  const { type, title, category, date, description } = entry
+  const { type, title, categories, date, description } = entry
 
   return (
     <Card className="text-left">
@@ -32,7 +32,9 @@ export default function EntryCard({ entry, onEdit }: { entry: Entry; onEdit?: ()
         </div>
         <div className="flex gap-2 text-xs text-muted-foreground mt-3">
           <span>{date}</span>
-          {category && <span>· {category}</span>}
+          {categories.map((cat) => (
+            <Badge key={cat} variant="outline" className="text-xs px-1.5 py-0">{cat}</Badge>
+          ))}
         </div>
       </CardContent>
     </Card>

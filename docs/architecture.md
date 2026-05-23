@@ -14,7 +14,7 @@ Domain terms, data types, and architectural concepts used throughout this codeba
 
 **Lesson** — An `Entry` of `type: 'lesson'`. Represents something the user learned, typically from a setback or mistake.
 
-**Category** — A free-text label on an `Entry` used to group related entries. Optional; max 50 characters.
+**Category** — One of potentially many labels on an `Entry` used to group related entries. Stored as `categories: string[]` on `Entry` and serialised to the Sheets `category` column as a JSON array (e.g. `["Work","Health"]`). Legacy entries that stored a plain string are read back as a single-element array. Each value is max 50 characters. Available values are surfaced from the Lookups sheet and from the unique categories already present in loaded entries.
 
 **SheetRef** — A lightweight pointer (`{ id: string; title: string }`) to the user's Google Spreadsheet, persisted in `localStorage` under the key `arc-spreadsheet`. Defined at `src/lib/storage.ts`. Avoids re-prompting for the spreadsheet ID on every page load.
 
@@ -22,11 +22,13 @@ Domain terms, data types, and architectural concepts used throughout this codeba
 
 **Entries sheet** — The tab named `"Entries"` inside the Arc Ledger spreadsheet. `initSheet` creates it on first use if absent. Columns: `id | type | title | description | category | date | createdAt`.
 
+**Lookups sheet** — The tab named `"Lookups"` inside the Arc Ledger spreadsheet. `initSheet` creates it on first use if absent. Columns: `type | value`. Stores managed lookup values keyed by type (e.g. `type = "category"` for category options). Extensible for future lookup kinds without schema changes.
+
 ---
 
 ## Data Model (`src/models/entry.ts`)
 
-**`Entry`** — Full persisted record. Fields: `id` (UUID), `type`, `title`, `description`, `category`, `date` (user-supplied date string), `createdAt` (ISO timestamp set at creation).
+**`Entry`** — Full persisted record. Fields: `id` (UUID), `type`, `title`, `description`, `categories` (string array), `date` (user-supplied date string), `createdAt` (ISO timestamp set at creation).
 
 **`EntryFields`** — The subset of `Entry` accepted as user input when creating a new entry. `description` and `category` are optional here.
 
@@ -75,10 +77,15 @@ Domain terms, data types, and architectural concepts used throughout this codeba
 
 **`useEntries`** (`src/hooks/useEntries.ts`) — Primary data hook. On mount (when authorised), fetches entries from the Sheets API. Exposes `addEntry(fields)` which validates, creates, and appends an entry both locally and to the spreadsheet.
 
-**`googleSheets` service** (`src/services/googleSheets.ts`) — Thin wrapper over the Google Sheets REST API. Three exported functions:
+**`useCategories`** (`src/hooks/useCategories.ts`) — Hook that fetches category values from the Lookups sheet on auth and exposes `addCategory(name)`. New categories are added optimistically to local state and persisted to the sheet; failures roll back the local state.
+
+**`googleSheets` service** (`src/services/googleSheets.ts`) — Thin wrapper over the Google Sheets REST API. Exported functions:
 - `readEntries(spreadsheetId, accessToken)` — GET the `Entries` range; maps rows to `Entry` objects.
 - `appendEntry(spreadsheetId, accessToken, entry)` — POST a new row; retries once after 2 s on failure.
-- `initSheet(spreadsheetId, accessToken)` — Ensures the `Entries` tab and header row exist; idempotent.
+- `updateEntry(spreadsheetId, accessToken, entry)` — Reads the sheet to find the row index, then PUTs the updated row.
+- `readCategories(spreadsheetId, accessToken)` — GET the `Lookups` range; returns `string[]` of values where `type === "category"`.
+- `appendCategory(spreadsheetId, accessToken, category)` — POST a new category row to the Lookups sheet.
+- `initSheet(spreadsheetId, accessToken)` — Ensures both the `Entries` and `Lookups` tabs and their header rows exist; idempotent.
 
 **`storage`** (`src/lib/storage.ts`) — `localStorage` helpers for `SheetRef`. `loadSheetRef()` parses and validates; `saveSheetRef(ref)` serialises. Key: `arc-spreadsheet`.
 

@@ -10,6 +10,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import CategorySelect from './CategorySelect'
 
 import type { EntryFields } from '@/models/entry'
 
@@ -22,15 +23,17 @@ interface EntryFormProps {
   initialValues?: Partial<EntryFields>
   onCancel?: () => void
   submitLabel?: string
+  categories?: string[]
+  onAddCategory?: (name: string) => void
 }
 
-export default function EntryForm({ onSubmit, initialValues, onCancel, submitLabel = 'Save Entry' }: EntryFormProps) {
+export default function EntryForm({ onSubmit, initialValues, onCancel, submitLabel = 'Save Entry', categories = [], onAddCategory }: EntryFormProps) {
   const form = useForm<FormValues>({
     defaultValues: {
       type: initialValues?.type ?? 'achievement',
       title: initialValues?.title ?? '',
       description: initialValues?.description ?? '',
-      category: initialValues?.category ?? '',
+      categories: initialValues?.categories ?? [],
       date: initialValues?.date ?? today(),
     },
   })
@@ -42,7 +45,7 @@ export default function EntryForm({ onSubmit, initialValues, onCancel, submitLab
     }
     onSubmit(values)
     if (!onCancel) {
-      form.reset({ ...form.getValues(), title: '', description: '', category: '', date: today() })
+      form.reset({ ...form.getValues(), title: '', description: '', categories: [], date: today() })
     }
   }
 
@@ -111,13 +114,16 @@ export default function EntryForm({ onSubmit, initialValues, onCancel, submitLab
 
         <FormField
           control={form.control}
-          name="category"
+          name="categories"
           render={({ field }) => (
             <FormItem>
               <FormLabel htmlFor="entry-category">Category</FormLabel>
-              <FormControl>
-                <Input id="entry-category" aria-label="Category" placeholder="e.g. Work, Health" {...field} />
-              </FormControl>
+              <CategorySelect
+                value={(field.value as string[]) ?? []}
+                onChange={field.onChange}
+                categories={categories}
+                onAddCategory={onAddCategory}
+              />
               <FormMessage />
             </FormItem>
           )}

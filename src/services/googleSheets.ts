@@ -5,11 +5,26 @@ const SHEET_NAME = 'Entries'
 const RANGE = `${SHEET_NAME}!A:G`
 const HEADER = ['id', 'type', 'title', 'description', 'category', 'date', 'createdAt']
 
+const LOOKUPS_SHEET_NAME = 'Lookups'
+const LOOKUPS_RANGE = `${LOOKUPS_SHEET_NAME}!A:B`
+const LOOKUPS_HEADER = ['type', 'value']
+
 function authHeaders(accessToken: string): Record<string, string> {
   return {
     Authorization: `Bearer ${accessToken}`,
     'Content-Type': 'application/json',
   }
+}
+
+function parseCategories(raw: string): string[] {
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw)
+    if (Array.isArray(parsed)) return parsed.filter(Boolean)
+  } catch {
+    // legacy plain-string format
+  }
+  return [raw]
 }
 
 function rowToEntry(row: string[]): Entry {
@@ -18,7 +33,7 @@ function rowToEntry(row: string[]): Entry {
     type: (row[1] === 'lesson' ? 'lesson' : 'achievement') as Entry['type'],
     title: row[2] ?? '',
     description: row[3] ?? '',
-    category: row[4] ?? '',
+    categories: parseCategories(row[4] ?? ''),
     date: row[5] ?? '',
     createdAt: row[6] ?? '',
   }
@@ -39,7 +54,7 @@ export async function appendEntry(
   entry: Entry
 ): Promise<void> {
   const url = `${BASE_URL}/${spreadsheetId}/values/${RANGE}:append?valueInputOption=RAW`
-  const row = [entry.id, entry.type, entry.title, entry.description, entry.category, entry.date, entry.createdAt]
+  const row = [entry.id, entry.type, entry.title, entry.description, JSON.stringify(entry.categories), entry.date, entry.createdAt]
   const body = JSON.stringify({ values: [row] })
 
   async function attempt(): Promise<void> {
@@ -78,7 +93,7 @@ export async function updateEntry(
 
   const sheetRow = rowIndex + 1
   const range = `${SHEET_NAME}!A${sheetRow}:G${sheetRow}`
-  const row = [entry.id, entry.type, entry.title, entry.description, entry.category, entry.date, entry.createdAt]
+  const row = [entry.id, entry.type, entry.title, entry.description, JSON.stringify(entry.categories), entry.date, entry.createdAt]
 
   const updateUrl = `${BASE_URL}/${spreadsheetId}/values/${range}?valueInputOption=RAW`
   const updateRes = await fetch(updateUrl, {
@@ -89,26 +104,63 @@ export async function updateEntry(
   if (!updateRes.ok) throw new Error(`Sheets API error: ${updateRes.status}`)
 }
 
+export async function readCategories(spreadsheetId: string, accessToken: string): Promise<string[]> {
+  const url = `${BASE_URL}/${spreadsheetId}/values/${LOOKUPS_RANGE}`
+  const res = await fetch(url, { headers: authHeaders(accessToken) })
+  const data = await res.json() as { values?: string[][] }
+  if (!data.values || data.values.length <= 1) return []
+  return data.values
+    .slice(1)
+    .filter((row) => row[0] === 'category' && row[1])
+    .map((row) => row[1])
+}
+
+export async function appendCategory(
+  spreadsheetId: string,
+  accessToken: string,
+  category: string
+): Promise<void> {
+  const url = `${BASE_URL}/${spreadsheetId}/values/${LOOKUPS_RANGE}:append?valueInputOption=RAW`
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ values: [['category', category]] }),
+  })
+  if (!res.ok) throw new Error(`Sheets API error: ${res.status}`)
+}
+
+async function ensureSheet(
+  spreadsheetId: string,
+  accessToken: string,
+  name: string,
+  headerRange: string,
+  header: string[]
+): Promise<void> {
+  const batchUrl = `${BASE_URL}/${spreadsheetId}:batchUpdate`
+  await fetch(batchUrl, {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ requests: [{ addSheet: { properties: { title: name } } }] }),
+  })
+  const headerUrl = `${BASE_URL}/${spreadsheetId}/values/${headerRange}:append?valueInputOption=RAW`
+  await fetch(headerUrl, {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ values: [header] }),
+  })
+}
+
 export async function initSheet(spreadsheetId: string, accessToken: string): Promise<void> {
   const metaUrl = `${BASE_URL}/${spreadsheetId}`
   const metaRes = await fetch(metaUrl, { headers: authHeaders(accessToken) })
   const meta = await metaRes.json() as { sheets: Array<{ properties: { title: string } }> }
+  const titles = meta.sheets?.map((s) => s.properties.title) ?? []
 
-  const hasEntriesSheet = meta.sheets?.some((s) => s.properties.title === SHEET_NAME)
+  if (!titles.includes(SHEET_NAME)) {
+    await ensureSheet(spreadsheetId, accessToken, SHEET_NAME, `${SHEET_NAME}!A1:G1`, HEADER)
+  }
 
-  if (!hasEntriesSheet) {
-    const batchUrl = `${BASE_URL}/${spreadsheetId}:batchUpdate`
-    await fetch(batchUrl, {
-      method: 'POST',
-      headers: authHeaders(accessToken),
-      body: JSON.stringify({ requests: [{ addSheet: { properties: { title: SHEET_NAME } } }] }),
-    })
-
-    const headerUrl = `${BASE_URL}/${spreadsheetId}/values/${SHEET_NAME}!A1:G1:append?valueInputOption=RAW`
-    await fetch(headerUrl, {
-      method: 'POST',
-      headers: authHeaders(accessToken),
-      body: JSON.stringify({ values: [HEADER] }),
-    })
+  if (!titles.includes(LOOKUPS_SHEET_NAME)) {
+    await ensureSheet(spreadsheetId, accessToken, LOOKUPS_SHEET_NAME, `${LOOKUPS_SHEET_NAME}!A1:B1`, LOOKUPS_HEADER)
   }
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { readEntries, appendEntry, initSheet, updateEntry } from '../../src/services/googleSheets'
+import { readEntries, appendEntry, initSheet, updateEntry, readCategories, appendCategory } from '../../src/services/googleSheets'
 import type { Entry } from '../../src/models/entry'
 
 const SPREADSHEET_ID = 'test-spreadsheet-id'
@@ -11,9 +11,19 @@ const DATA_ROW: string[] = [
   'achievement',
   'My title',
   'My description',
-  'Work',
+  '["Work"]',
   '2026-05-23',
   '2026-05-23T10:00:00.000Z',
+]
+
+const LEGACY_DATA_ROW: string[] = [
+  'uuid-2',
+  'lesson',
+  'Legacy title',
+  '',
+  'OldCategory',
+  '2026-05-22',
+  '2026-05-22T10:00:00.000Z',
 ]
 
 beforeEach(() => {
@@ -34,9 +44,20 @@ describe('readEntries', () => {
     expect(entries[0].type).toBe('achievement')
     expect(entries[0].title).toBe('My title')
     expect(entries[0].description).toBe('My description')
-    expect(entries[0].category).toBe('Work')
+    expect(entries[0].categories).toEqual(['Work'])
     expect(entries[0].date).toBe('2026-05-23')
     expect(entries[0].createdAt).toBe('2026-05-23T10:00:00.000Z')
+  })
+
+  it('parses a legacy plain-string category into a single-element array', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ values: [HEADER_ROW, LEGACY_DATA_ROW] }),
+    }))
+
+    const entries = await readEntries(SPREADSHEET_ID, ACCESS_TOKEN)
+
+    expect(entries[0].categories).toEqual(['OldCategory'])
   })
 
   it('returns an empty array when values is absent', async () => {
@@ -85,7 +106,7 @@ describe('appendEntry', () => {
     type: 'achievement',
     title: 'My title',
     description: 'My description',
-    category: 'Work',
+    categories: ['Work'],
     date: '2026-05-23',
     createdAt: '2026-05-23T10:00:00.000Z',
   }
@@ -114,7 +135,7 @@ describe('appendEntry', () => {
     const body = JSON.parse((mockFetch.mock.calls[0][1] as RequestInit).body as string)
     expect(body.values[0]).toHaveLength(7)
     expect(body.values[0]).toEqual([
-      entry.id, entry.type, entry.title, entry.description, entry.category, entry.date, entry.createdAt,
+      entry.id, entry.type, entry.title, entry.description, JSON.stringify(entry.categories), entry.date, entry.createdAt,
     ])
   })
 
@@ -143,7 +164,7 @@ describe('updateEntry', () => {
     type: 'lesson',
     title: 'Updated title',
     description: 'Updated desc',
-    category: 'Health',
+    categories: ['Health'],
     date: '2026-05-24',
     createdAt: '2026-05-23T10:00:00.000Z',
   }
@@ -167,7 +188,7 @@ describe('updateEntry', () => {
     expect((putOptions as RequestInit).method).toBe('PUT')
     const body = JSON.parse((putOptions as RequestInit).body as string)
     expect(body.values[0]).toEqual([
-      entry.id, entry.type, entry.title, entry.description, entry.category, entry.date, entry.createdAt,
+      entry.id, entry.type, entry.title, entry.description, JSON.stringify(entry.categories), entry.date, entry.createdAt,
     ])
   })
 
@@ -182,19 +203,119 @@ describe('updateEntry', () => {
 })
 
 describe('initSheet', () => {
-  it('calls batchUpdate to add sheet and appends header row when Entries sheet is absent', async () => {
+  it('creates both sheets when neither exists', async () => {
     const mockFetch = vi.fn()
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ sheets: [{ properties: { title: 'Sheet1' } }] }),
       })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+      .mockResolvedValue({ ok: true, json: async () => ({}) })
+
+    vi.stubGlobal('fetch', mockFetch)
+
+    await initSheet(SPREADSHEET_ID, ACCESS_TOKEN)
+
+    expect(mockFetch).toHaveBeenCalledTimes(5)
+  })
+
+  it('skips creation when both sheets already exist', async () => {
+    const mockFetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        sheets: [
+          { properties: { title: 'Entries' } },
+          { properties: { title: 'Lookups' } },
+        ],
+      }),
+    })
+    vi.stubGlobal('fetch', mockFetch)
+
+    await initSheet(SPREADSHEET_ID, ACCESS_TOKEN)
+
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('creates only Lookups when Entries already exists', async () => {
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ sheets: [{ properties: { title: 'Entries' } }] }),
+      })
+      .mockResolvedValue({ ok: true, json: async () => ({}) })
 
     vi.stubGlobal('fetch', mockFetch)
 
     await initSheet(SPREADSHEET_ID, ACCESS_TOKEN)
 
     expect(mockFetch).toHaveBeenCalledTimes(3)
+  })
+})
+
+describe('readCategories', () => {
+  it('returns category values from the Lookups sheet', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ values: [['type', 'value'], ['category', 'Work'], ['category', 'Health']] }),
+    }))
+
+    const categories = await readCategories(SPREADSHEET_ID, ACCESS_TOKEN)
+
+    expect(categories).toEqual(['Work', 'Health'])
+  })
+
+  it('ignores rows that are not category type', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ values: [['type', 'value'], ['category', 'Work'], ['tag', 'important']] }),
+    }))
+
+    const categories = await readCategories(SPREADSHEET_ID, ACCESS_TOKEN)
+
+    expect(categories).toEqual(['Work'])
+  })
+
+  it('returns empty array when Lookups sheet has no data rows', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ values: [['type', 'value']] }),
+    }))
+
+    const categories = await readCategories(SPREADSHEET_ID, ACCESS_TOKEN)
+
+    expect(categories).toEqual([])
+  })
+
+  it('returns empty array when values is absent', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    }))
+
+    const categories = await readCategories(SPREADSHEET_ID, ACCESS_TOKEN)
+
+    expect(categories).toEqual([])
+  })
+})
+
+describe('appendCategory', () => {
+  it('POSTs a category row to the Lookups sheet', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) })
+    vi.stubGlobal('fetch', mockFetch)
+
+    await appendCategory(SPREADSHEET_ID, ACCESS_TOKEN, 'Learning')
+
+    expect(mockFetch).toHaveBeenCalledOnce()
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('Lookups'),
+      expect.objectContaining({ method: 'POST' })
+    )
+    const body = JSON.parse((mockFetch.mock.calls[0][1] as RequestInit).body as string)
+    expect(body.values[0]).toEqual(['category', 'Learning'])
+  })
+
+  it('throws when the API response is not ok', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 403 }))
+
+    await expect(appendCategory(SPREADSHEET_ID, ACCESS_TOKEN, 'Work')).rejects.toThrow(/403/)
   })
 })

@@ -67,8 +67,16 @@ describe('validateEntry', () => {
     expect(fail(validateEntry({ ...base, description: 'a'.repeat(2001) })).errors.description).toBeDefined()
   })
 
-  it('rejects category longer than 50 characters', () => {
-    expect(fail(validateEntry({ ...base, category: 'a'.repeat(51) })).errors.category).toBeDefined()
+  it('rejects any category value longer than 50 characters', () => {
+    expect(fail(validateEntry({ ...base, categories: ['a'.repeat(51)] })).errors.categories).toBeDefined()
+  })
+
+  it('accepts an empty categories array', () => {
+    expect(validateEntry({ ...base, categories: [] }).valid).toBe(true)
+  })
+
+  it('accepts multiple valid category values', () => {
+    expect(validateEntry({ ...base, categories: ['Work', 'Health'] }).valid).toBe(true)
   })
 
   it('rejects an invalid date string', () => {

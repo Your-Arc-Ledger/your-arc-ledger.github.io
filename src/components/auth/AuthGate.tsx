@@ -73,6 +73,7 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
       )
       if (!res.ok) throw new Error(`Could not fetch spreadsheet (${res.status})`)
       const meta = await res.json() as { properties?: { title?: string } }
+      await initSheet(id, accessToken)
       saveSheetRef({ id, title: meta.properties?.title ?? 'your spreadsheet' })
       onSelected(id)
     } catch (e) {

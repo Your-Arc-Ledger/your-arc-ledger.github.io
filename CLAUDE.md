@@ -101,3 +101,7 @@ Present suggestions as specific proposed edits — not vague observations. The u
 ## Testing conventions
 
 Test files live under `tests/unit/` mirroring the `src/` structure. Import paths in test files are relative to the test file's own location — e.g. a test at `tests/unit/components/auth/Foo.test.tsx` imports source as `../../../../src/...`, not `../../../src/...`. Use `import type` for type-only imports alongside component imports.
+
+**Mocking modules**: use relative paths in `vi.mock()` calls — do not use the `@/` alias. The alias resolves correctly at runtime but may not match mock registrations in all Vitest versions. Example: `vi.mock('../../../src/services/googleSheets', ...)` not `vi.mock('@/services/googleSheets', ...)`.
+
+**Hook tests with async effects**: when a hook fires an async effect on mount (e.g. a data fetch), the effect's promise may not be settled before the first explicit `act` in the test. Flush pending microtasks with `await act(async () => {})` after `renderHook` before asserting on state that depends on the fetch, or before calling a function that would race with it.

@@ -48,17 +48,24 @@ describe('EntryForm', () => {
   })
 
   it('pre-fills fields from initialValues', () => {
-    const initial: EntryFields = { type: 'lesson', title: 'Existing title', description: 'Some desc', category: 'Work', date: '2026-01-15' }
+    const initial: EntryFields = { type: 'lesson', title: 'Existing title', description: 'Some desc', categories: ['Work'], date: '2026-01-15' }
     render(<EntryForm onSubmit={vi.fn()} initialValues={initial} />)
     expect(screen.getByLabelText(/title/i)).toHaveValue('Existing title')
     expect(screen.getByLabelText(/description/i)).toHaveValue('Some desc')
-    expect(screen.getByLabelText(/category/i)).toHaveValue('Work')
+    expect(screen.getByText('Work')).toBeInTheDocument()
     expect(screen.getByLabelText(/date/i)).toHaveValue('2026-01-15')
   })
 
   it('uses submitLabel for the submit button text', () => {
     render(<EntryForm onSubmit={vi.fn()} submitLabel="Save Changes" />)
     expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument()
+  })
+
+  it('shows available categories in the dropdown when the category input is focused', () => {
+    render(<EntryForm onSubmit={vi.fn()} categories={['Work', 'Health']} />)
+    fireEvent.focus(screen.getByLabelText(/category/i))
+    expect(screen.getByRole('button', { name: 'Work' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Health' })).toBeInTheDocument()
   })
 
   it('calls onSubmit with correctly shaped fields on valid submission', async () => {

@@ -9,7 +9,7 @@ const makeEntry = (overrides: Partial<Entry> = {}): Entry => ({
   type: 'achievement',
   title: 'Test',
   description: '',
-  category: '',
+  categories: [],
   date: '2026-05-23',
   createdAt: new Date().toISOString(),
   ...overrides,

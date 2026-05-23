@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useMemo } from 'react'
 import { AuthProvider } from './context/AuthContext'
 import { EntriesProvider } from './context/EntriesContext'
 import { useEntries } from './hooks/useEntries'
+import { useCategories } from './hooks/useCategories'
 import EntryForm from './components/entry/EntryForm'
 import EntryList from './components/entry/EntryList'
 import EntrySummary from './components/summary/EntrySummary'
@@ -9,7 +10,14 @@ import AuthGate from './components/auth/AuthGate'
 import type { Entry, EntryFields } from './models/entry'
 
 function AppContent() {
-  const { addEntry, updateEntry } = useEntries()
+  const { entries, addEntry, updateEntry } = useEntries()
+  const { categories: savedCategories, addCategory } = useCategories()
+
+  const categories = useMemo(() => {
+    const fromEntries = entries.flatMap((e) => e.categories).filter(Boolean)
+    return Array.from(new Set([...savedCategories, ...fromEntries])).sort()
+  }, [savedCategories, entries])
+
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null)
   const formSectionRef = useRef<HTMLElement>(null)
 
@@ -36,7 +44,7 @@ function AppContent() {
         <section ref={formSectionRef}>
           <h2 className="text-lg font-medium mb-4">{editingEntry ? 'Edit Entry' : 'Log an Entry'}</h2>
           <div className={editingEntry ? 'hidden' : ''}>
-            <EntryForm onSubmit={handleSubmit} />
+            <EntryForm onSubmit={handleSubmit} categories={categories} onAddCategory={addCategory} />
           </div>
           {editingEntry && (
             <EntryForm
@@ -44,6 +52,8 @@ function AppContent() {
               onSubmit={handleEditSave}
               onCancel={() => setEditingEntry(null)}
               submitLabel="Save Changes"
+              categories={categories}
+              onAddCategory={addCategory}
             />
           )}
         </section>

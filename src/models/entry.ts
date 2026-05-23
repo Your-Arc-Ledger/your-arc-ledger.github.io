@@ -3,7 +3,7 @@ export interface Entry {
   type: 'achievement' | 'lesson'
   title: string
   description: string
-  category: string
+  categories: string[]
   date: string
   createdAt: string
 }
@@ -13,7 +13,7 @@ export type EntryFields = {
   title: string
   date: string
   description?: string
-  category?: string
+  categories?: string[]
 }
 
 export interface ValidationResult {
@@ -28,7 +28,7 @@ export interface ValidationFailure {
 export function createEntry(fields: EntryFields): Entry {
   return {
     description: '',
-    category: '',
+    categories: [],
     ...fields,
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
@@ -54,8 +54,8 @@ export function validateEntry(
     errors.description = 'Description must be 2000 characters or fewer'
   }
 
-  if (entry.category && entry.category.length > 50) {
-    errors.category = 'Category must be 50 characters or fewer'
+  if (entry.categories?.some((c) => c.length > 50)) {
+    errors.categories = 'Each category must be 50 characters or fewer'
   }
 
   if (!entry.date || isNaN(Date.parse(entry.date))) {
