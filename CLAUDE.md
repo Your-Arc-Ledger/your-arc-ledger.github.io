@@ -24,7 +24,11 @@ Never include AI attribution in commit messages. Do not add `Co-Authored-By`, `G
 
 ## Source Layout
 
-`src/components/` — UI components; `src/hooks/` — custom hooks; `src/services/` — external API clients; `src/context/` — React context providers; `src/models/` — data types.
+`src/components/` — UI components; `src/hooks/` — custom hooks; `src/services/` — external API clients; `src/context/` — React context providers; `src/models/` — data types; `src/lib/` — utilities and storage helpers.
+
+## Testing conventions
+
+Test files live under `tests/unit/` mirroring the `src/` structure. Import paths in test files are relative to the test file's own location — e.g. a test at `tests/unit/components/auth/Foo.test.tsx` imports source as `../../../../src/...`, not `../../../src/...`.
 
 ## Session Self-Evaluation
 
