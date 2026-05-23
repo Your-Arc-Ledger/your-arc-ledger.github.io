@@ -25,6 +25,6 @@ if (typeof localStorage === 'undefined') {
       const keys = Object.keys(store)
       return keys[index] || null
     },
-    length: Object.keys(store).length,
+    get length() { return Object.keys(store).length },
   } as Storage
 }
