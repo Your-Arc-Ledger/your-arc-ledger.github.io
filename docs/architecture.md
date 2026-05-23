@@ -1,4 +1,4 @@
-# Arc Glossary
+# Architecture
 
 Domain terms, data types, and architectural concepts used throughout this codebase.
 

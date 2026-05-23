@@ -26,9 +26,9 @@ Never include AI attribution in commit messages. Do not add `Co-Authored-By`, `G
 
 `src/components/` — UI components; `src/hooks/` — custom hooks; `src/services/` — external API clients; `src/context/` — React context providers; `src/models/` — data types; `src/lib/` — utilities and storage helpers.
 
-## Glossary
+## Architecture
 
-Domain terms, data model types, state machine statuses, and architectural concepts are defined in [`docs/glossary.md`](docs/glossary.md). Consult it when uncertain about what a term means in this codebase.
+Domain terms, data model types, state machine statuses, and architectural concepts are defined in [`docs/architecture.md`](docs/architecture.md). Consult it when uncertain about what a term means in this codebase.
 
 ## Testing conventions
 
