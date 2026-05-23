@@ -1,10 +1,8 @@
 import { createContext, useReducer, useContext, useEffect, type ReactNode, type Dispatch } from 'react'
-import { loadTokenCache, saveTokenCache, clearTokenCache } from '@/lib/storage'
-
-const TOKEN_BUFFER_MS = 5 * 60 * 1000
+import { loadSessionHint, saveSessionHint, clearSessionHint } from '@/lib/storage'
 
 export interface AuthState {
-  status: 'idle' | 'authorising' | 'authorised' | 'error'
+  status: 'idle' | 'restoring' | 'authorising' | 'authorised' | 'error'
   accessToken: string | null
   expiresAt: number | null
   error: string | null
@@ -42,9 +40,8 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
 }
 
 function initFromCache(init: AuthState): AuthState {
-  const cache = loadTokenCache()
-  if (cache && cache.expiresAt > Date.now() + TOKEN_BUFFER_MS) {
-    return { status: 'authorised', accessToken: cache.accessToken, expiresAt: cache.expiresAt, error: null }
+  if (loadSessionHint()) {
+    return { ...init, status: 'restoring' }
   }
   return init
 }
@@ -60,12 +57,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState, initFromCache)
 
   useEffect(() => {
-    if (state.status === 'authorised' && state.accessToken && state.expiresAt) {
-      saveTokenCache({ accessToken: state.accessToken, expiresAt: state.expiresAt })
-    } else if (state.status === 'idle') {
-      clearTokenCache()
+    if (state.status === 'authorised' && state.expiresAt) {
+      saveSessionHint({ expiresAt: state.expiresAt })
+    } else if (state.status === 'idle' || state.status === 'error') {
+      clearSessionHint()
     }
-  }, [state.status, state.accessToken, state.expiresAt])
+  }, [state.status, state.expiresAt])
 
   return (
     <AuthContext.Provider value={{ state, dispatch }}>

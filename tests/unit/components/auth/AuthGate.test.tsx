@@ -114,6 +114,20 @@ describe('AuthGate — SpreadsheetPicker create path', () => {
   })
 })
 
+describe('AuthGate — restoring state', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    vi.restoreAllMocks()
+  })
+
+  it('shows reconnecting indicator without a connect button', () => {
+    renderAuthGate({ status: 'restoring' })
+
+    expect(screen.getByText(/reconnecting/i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /connect/i })).not.toBeInTheDocument()
+  })
+})
+
 describe('AuthGate — error state', () => {
   beforeEach(() => {
     localStorage.clear()

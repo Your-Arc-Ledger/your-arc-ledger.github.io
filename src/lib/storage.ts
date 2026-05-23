@@ -1,5 +1,5 @@
 const SHEET_REF_KEY = 'arc-spreadsheet'
-const TOKEN_CACHE_KEY = 'arc-token-cache'
+const SESSION_HINT_KEY = 'arc-session-hint'
 
 export interface SheetRef {
   id: string
@@ -29,23 +29,21 @@ export function saveSheetRef(ref: SheetRef): void {
   localStorage.setItem(SHEET_REF_KEY, JSON.stringify(ref))
 }
 
-export interface TokenCache {
-  accessToken: string
+export interface SessionHint {
   expiresAt: number
 }
 
-export function loadTokenCache(): TokenCache | null {
+export function loadSessionHint(): SessionHint | null {
   try {
-    const raw = localStorage.getItem(TOKEN_CACHE_KEY)
+    const raw = localStorage.getItem(SESSION_HINT_KEY)
     if (!raw) return null
     const parsed = JSON.parse(raw) as unknown
     if (
       typeof parsed === 'object' &&
       parsed !== null &&
-      typeof (parsed as TokenCache).accessToken === 'string' &&
-      typeof (parsed as TokenCache).expiresAt === 'number'
+      typeof (parsed as SessionHint).expiresAt === 'number'
     ) {
-      return parsed as TokenCache
+      return parsed as SessionHint
     }
     return null
   } catch {
@@ -53,10 +51,10 @@ export function loadTokenCache(): TokenCache | null {
   }
 }
 
-export function saveTokenCache(cache: TokenCache): void {
-  localStorage.setItem(TOKEN_CACHE_KEY, JSON.stringify(cache))
+export function saveSessionHint(hint: SessionHint): void {
+  localStorage.setItem(SESSION_HINT_KEY, JSON.stringify(hint))
 }
 
-export function clearTokenCache(): void {
-  localStorage.removeItem(TOKEN_CACHE_KEY)
+export function clearSessionHint(): void {
+  localStorage.removeItem(SESSION_HINT_KEY)
 }

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { AuthProvider, useAuth } from '../../../src/context/AuthContext'
 import { useGoogleAuth } from '../../../src/hooks/useGoogleAuth'
-import { saveTokenCache } from '../../../src/lib/storage'
+import { saveSessionHint } from '../../../src/lib/storage'
 
 function wrapper({ children }: { children: React.ReactNode }) {
   return <AuthProvider>{children}</AuthProvider>
@@ -84,8 +84,8 @@ describe('useGoogleAuth — manual auth', () => {
 })
 
 describe('useGoogleAuth — silent re-auth on page load', () => {
-  it('calls requestAccessToken with prompt:none when there is an expired cached token', async () => {
-    saveTokenCache({ accessToken: 'old-token', expiresAt: Date.now() - 1000 })
+  it('calls requestAccessToken with prompt:none when there is a session hint', async () => {
+    saveSessionHint({ expiresAt: Date.now() + 3600 * 1000 })
 
     const mockRequestAccessToken = vi.fn()
     const mockInitTokenClient = vi.fn().mockReturnValue({ requestAccessToken: mockRequestAccessToken })
@@ -107,8 +107,37 @@ describe('useGoogleAuth — silent re-auth on page load', () => {
     expect(result.current.auth.state.status).toBe('authorising')
   })
 
+  it('starts in restoring state when a session hint exists', () => {
+    saveSessionHint({ expiresAt: Date.now() + 3600 * 1000 })
+
+    const { result } = renderHook(
+      () => useAuth(),
+      { wrapper }
+    )
+
+    expect(result.current.state.status).toBe('restoring')
+  })
+
+  it('attempts silent re-auth even when the hint is expired', async () => {
+    saveSessionHint({ expiresAt: Date.now() - 1000 })
+
+    const mockRequestAccessToken = vi.fn()
+    const mockInitTokenClient = vi.fn().mockReturnValue({ requestAccessToken: mockRequestAccessToken })
+    Object.defineProperty(globalThis, 'google', {
+      value: { accounts: { oauth2: { initTokenClient: mockInitTokenClient } } },
+      configurable: true,
+      writable: true,
+    })
+
+    renderHook(() => ({ auth: useAuth(), googleAuth: useGoogleAuth() }), { wrapper })
+
+    await waitFor(() => {
+      expect(mockRequestAccessToken).toHaveBeenCalledWith({ prompt: 'none' })
+    })
+  })
+
   it('transitions to authorised when silent re-auth succeeds', async () => {
-    saveTokenCache({ accessToken: 'old-token', expiresAt: Date.now() - 1000 })
+    saveSessionHint({ expiresAt: Date.now() + 3600 * 1000 })
 
     let capturedCallback: ((r: { access_token?: string; error?: string }) => void) | undefined
     const mockInitTokenClient = vi.fn((config: { callback: typeof capturedCallback }) => {
@@ -137,7 +166,7 @@ describe('useGoogleAuth — silent re-auth on page load', () => {
   })
 
   it('returns to idle when silent re-auth fails', async () => {
-    saveTokenCache({ accessToken: 'old-token', expiresAt: Date.now() - 1000 })
+    saveSessionHint({ expiresAt: Date.now() + 3600 * 1000 })
 
     let capturedCallback: ((r: { access_token?: string; error?: string }) => void) | undefined
     const mockInitTokenClient = vi.fn((config: { callback: typeof capturedCallback }) => {
@@ -164,7 +193,7 @@ describe('useGoogleAuth — silent re-auth on page load', () => {
     expect(result.current.auth.state.status).toBe('idle')
   })
 
-  it('does not attempt silent re-auth when there is no cached token', async () => {
+  it('does not attempt silent re-auth when there is no session hint', async () => {
     const mockRequestAccessToken = vi.fn()
     const mockInitTokenClient = vi.fn().mockReturnValue({ requestAccessToken: mockRequestAccessToken })
     Object.defineProperty(globalThis, 'google', {
@@ -175,7 +204,6 @@ describe('useGoogleAuth — silent re-auth on page load', () => {
 
     renderHook(() => useGoogleAuth(), { wrapper })
 
-    // Give effects time to settle
     await act(async () => {})
 
     expect(mockRequestAccessToken).not.toHaveBeenCalled()

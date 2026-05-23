@@ -136,6 +136,15 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     )
   }
 
+  if (state.status === 'restoring' || state.status === 'authorising') {
+    return (
+      <div className="max-w-md mx-auto mt-24 p-6 text-center space-y-4">
+        <h2 className="text-xl font-semibold">Arc</h2>
+        <p className="text-muted-foreground">Reconnecting…</p>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-md mx-auto mt-24 p-6 text-center space-y-4">
       <h2 className="text-xl font-semibold">Arc</h2>
@@ -162,11 +171,8 @@ export default function AuthGate({ children }: { children: ReactNode }) {
           <p className="text-muted-foreground">
             Connect your Google account to save entries to your own spreadsheet.
           </p>
-          <Button
-            onClick={initiateAuth}
-            disabled={state.status === 'authorising'}
-          >
-            {state.status === 'authorising' ? 'Connecting…' : 'Connect Google Account'}
+          <Button onClick={initiateAuth}>
+            Connect Google Account
           </Button>
         </>
       )}
