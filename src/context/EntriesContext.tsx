@@ -61,7 +61,7 @@ interface EntriesContextValue {
   dispatch: Dispatch<EntriesAction>
 }
 
-export const EntriesContext = createContext<EntriesContextValue | null>(null)
+const EntriesContext = createContext<EntriesContextValue | null>(null)
 
 export function EntriesProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(entriesReducer, initialState)
