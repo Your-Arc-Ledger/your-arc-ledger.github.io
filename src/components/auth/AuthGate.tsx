@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useGoogleAuth } from '@/hooks/useGoogleAuth'
 import { Button } from '@/components/ui/button'
@@ -135,7 +135,10 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     () => loadSheetRef()?.id ?? null
   )
 
-  const sheetRef = state.status === 'error' ? loadSheetRef() : null
+  const sheetRef = useMemo(
+    () => (state.status === 'error' ? loadSheetRef() : null),
+    [state.status]
+  )
 
   if (state.status === 'authorised' && spreadsheetId) {
     return <>{children}</>
