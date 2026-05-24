@@ -16,7 +16,7 @@ Domain terms, data types, and architectural concepts used throughout this codeba
 
 **Category** — One of potentially many labels on an `Entry` used to group related entries. Stored as `categories: string[]` on `Entry` and serialised to the Sheets `category` column as a JSON array (e.g. `["Work","Health"]`). Legacy entries that stored a plain string are read back as a single-element array. Each value is max 50 characters. Available values are surfaced from the Lookups sheet and from the unique categories already present in loaded entries.
 
-**SheetRef** — A lightweight pointer (`{ id: string; title: string }`) to the user's Google Spreadsheet, persisted in `localStorage` under the key `arc-spreadsheet`. Defined at `src/lib/storage.ts`. Avoids re-prompting for the spreadsheet ID on every page load.
+**SheetRef** — A lightweight pointer (`{ id: string; title: string }`) to the user's Google Spreadsheet, persisted in `localStorage` under the key `arc-spreadsheet:v1`. Defined at `src/lib/storage.ts`. Avoids re-prompting for the spreadsheet ID on every page load. Legacy entries stored under `arc-spreadsheet` (no version suffix) are migrated to `arc-spreadsheet:v1` on first load.
 
 **spreadsheetId** — The Google Sheets document identifier, extracted from the spreadsheet URL (`/spreadsheets/d/<spreadsheetId>/`). Used as the primary key for all Sheets API calls.
 

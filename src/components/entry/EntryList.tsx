@@ -66,7 +66,7 @@ export default function EntryList({ items: itemsProp, onEdit }: { items?: Entry[
           <p className="text-sm mt-1">Log your first achievement or setback above.</p>
         </div>
       ) : (
-        items.map((entry) => <EntryCard key={entry.id} entry={entry} onEdit={onEdit ? () => onEdit(entry) : undefined} />)
+        items.map((entry) => <EntryCard key={entry.id} entry={entry} onEdit={onEdit} />)
       )}
     </div>
   )

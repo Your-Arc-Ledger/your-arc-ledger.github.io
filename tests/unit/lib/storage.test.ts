@@ -21,18 +21,35 @@ describe('storage — SheetRef', () => {
   })
 
   it('returns null for malformed JSON', () => {
-    localStorage.setItem('arc-spreadsheet', 'not-json{')
+    localStorage.setItem('arc-spreadsheet:v1', 'not-json{')
     expect(loadSheetRef()).toBeNull()
   })
 
   it('returns null when stored value is missing the title field', () => {
-    localStorage.setItem('arc-spreadsheet', JSON.stringify({ id: 'abc' }))
+    localStorage.setItem('arc-spreadsheet:v1', JSON.stringify({ id: 'abc' }))
     expect(loadSheetRef()).toBeNull()
   })
 
   it('returns null when stored value is missing the id field', () => {
-    localStorage.setItem('arc-spreadsheet', JSON.stringify({ title: 'Arc' }))
+    localStorage.setItem('arc-spreadsheet:v1', JSON.stringify({ title: 'Arc' }))
     expect(loadSheetRef()).toBeNull()
+  })
+
+  it('migrates a SheetRef from the legacy unversioned key', () => {
+    const ref = { id: 'migrate-me', title: 'Old Sheet' }
+    localStorage.setItem('arc-spreadsheet', JSON.stringify(ref))
+    expect(loadSheetRef()).toEqual(ref)
+    expect(localStorage.getItem('arc-spreadsheet:v1')).not.toBeNull()
+    expect(localStorage.getItem('arc-spreadsheet')).toBeNull()
+  })
+
+  it('does not overwrite an existing v1 value when migrating legacy key', () => {
+    const existing = { id: 'new', title: 'New Sheet' }
+    const legacy = { id: 'old', title: 'Old Sheet' }
+    localStorage.setItem('arc-spreadsheet:v1', JSON.stringify(existing))
+    localStorage.setItem('arc-spreadsheet', JSON.stringify(legacy))
+    expect(loadSheetRef()).toEqual(existing)
+    expect(localStorage.getItem('arc-spreadsheet')).toBeNull()
   })
 })
 
@@ -50,12 +67,12 @@ describe('storage — SessionHint', () => {
   })
 
   it('returns null for malformed JSON', () => {
-    localStorage.setItem('arc-session-hint', 'not-json{')
+    localStorage.setItem('arc-session-hint:v1', 'not-json{')
     expect(loadSessionHint()).toBeNull()
   })
 
   it('returns null when stored value is missing expiresAt', () => {
-    localStorage.setItem('arc-session-hint', JSON.stringify({}))
+    localStorage.setItem('arc-session-hint:v1', JSON.stringify({}))
     expect(loadSessionHint()).toBeNull()
   })
 
@@ -63,5 +80,13 @@ describe('storage — SessionHint', () => {
     saveSessionHint({ expiresAt: 1234567890 })
     clearSessionHint()
     expect(loadSessionHint()).toBeNull()
+  })
+
+  it('migrates a SessionHint from the legacy unversioned key', () => {
+    const hint = { expiresAt: 9999999999 }
+    localStorage.setItem('arc-session-hint', JSON.stringify(hint))
+    expect(loadSessionHint()).toEqual(hint)
+    expect(localStorage.getItem('arc-session-hint:v1')).not.toBeNull()
+    expect(localStorage.getItem('arc-session-hint')).toBeNull()
   })
 })

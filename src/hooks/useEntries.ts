@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useEntriesContext } from '@/context/EntriesContext'
 import { useAuth } from '@/context/AuthContext'
 import { createEntry, validateEntry } from '@/models/entry'
@@ -33,7 +33,7 @@ export function useEntries() {
       })
   }, [authState.status, authState.accessToken, dispatch])
 
-  async function addEntry(fields: EntryFields) {
+  const addEntry = useCallback(async (fields: EntryFields) => {
     const validation = validateEntry(fields)
     if (!validation.valid) return
 
@@ -59,9 +59,9 @@ export function useEntries() {
       }
       dispatch({ type: 'SET_ERROR', payload: message })
     }
-  }
+  }, [authState.accessToken, dispatch])
 
-  async function updateEntry(entry: Entry) {
+  const updateEntry = useCallback(async (entry: Entry) => {
     const validation = validateEntry(entry)
     if (!validation.valid) return
 
@@ -86,7 +86,7 @@ export function useEntries() {
       }
       dispatch({ type: 'SET_ERROR', payload: message })
     }
-  }
+  }, [authState.accessToken, dispatch])
 
   return {
     entries: state.items,

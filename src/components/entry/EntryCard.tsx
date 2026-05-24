@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { Entry } from '@/models/entry'
 
-export default function EntryCard({ entry, onEdit }: { entry: Entry; onEdit?: () => void }) {
+export default function EntryCard({ entry, onEdit }: { entry: Entry; onEdit?: (entry: Entry) => void }) {
   const { type, title, categories, date, description } = entry
 
   return (
@@ -24,7 +24,7 @@ export default function EntryCard({ entry, onEdit }: { entry: Entry; onEdit?: ()
               {type}
             </Badge>
             {onEdit && (
-              <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={onEdit}>
+              <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => onEdit(entry)}>
                 Edit
               </Button>
             )}

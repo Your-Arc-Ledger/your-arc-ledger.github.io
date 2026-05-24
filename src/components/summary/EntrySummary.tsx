@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useEntriesContext } from '@/context/EntriesContext'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -7,13 +8,19 @@ const WINDOW_DAYS = 30
 export default function EntrySummary() {
   const { state } = useEntriesContext()
 
-  const cutoff = new Date()
-  cutoff.setDate(cutoff.getDate() - WINDOW_DAYS)
-  const cutoffStr = cutoff.toISOString().split('T')[0]
-
-  const recent = state.items.filter((e) => e.date >= cutoffStr)
-  const achievementCount = recent.filter((e) => e.type === 'achievement').length
-  const setbackCount = recent.filter((e) => e.type === 'setback').length
+  const { achievementCount, setbackCount } = useMemo(() => {
+    const cutoff = new Date()
+    cutoff.setDate(cutoff.getDate() - WINDOW_DAYS)
+    const cutoffStr = cutoff.toISOString().split('T')[0]
+    let achievementCount = 0
+    let setbackCount = 0
+    for (const e of state.items) {
+      if (e.date < cutoffStr) continue
+      if (e.type === 'achievement') achievementCount++
+      else setbackCount++
+    }
+    return { achievementCount, setbackCount }
+  }, [state.items])
 
   return (
     <Card>
