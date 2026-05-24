@@ -3,16 +3,24 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { AuthContext, type AuthState } from '../../../../src/context/AuthContext'
-import { EntriesContext, type EntriesState } from '../../../../src/context/EntriesContext'
 import LogoutButton from '../../../../src/components/auth/LogoutButton'
 import * as storage from '../../../../src/lib/storage'
 
-function renderLogoutButton(
-  authState: Partial<AuthState> = {},
-  entriesState: Partial<EntriesState> = {},
-) {
+const mockEntriesDispatch = vi.hoisted(() => vi.fn())
+
+vi.mock('../../../../src/context/EntriesContext', async (importOriginal) => {
+  const actual = await importOriginal() as Record<string, unknown>
+  return {
+    ...actual,
+    useEntriesContext: () => ({
+      state: { status: 'loaded', items: [], filter: 'all', error: null },
+      dispatch: mockEntriesDispatch,
+    }),
+  }
+})
+
+function renderLogoutButton(authState: Partial<AuthState> = {}) {
   const authDispatch = vi.fn()
-  const entriesDispatch = vi.fn()
 
   const fullAuthState: AuthState = {
     status: 'authorised',
@@ -21,23 +29,14 @@ function renderLogoutButton(
     error: null,
     ...authState,
   }
-  const fullEntriesState: EntriesState = {
-    status: 'loaded',
-    items: [],
-    filter: 'all',
-    error: null,
-    ...entriesState,
-  }
 
   render(
     <AuthContext.Provider value={{ state: fullAuthState, dispatch: authDispatch }}>
-      <EntriesContext.Provider value={{ state: fullEntriesState, dispatch: entriesDispatch }}>
-        <LogoutButton />
-      </EntriesContext.Provider>
+      <LogoutButton />
     </AuthContext.Provider>
   )
 
-  return { authDispatch, entriesDispatch }
+  return { authDispatch, entriesDispatch: mockEntriesDispatch }
 }
 
 describe('LogoutButton', () => {
