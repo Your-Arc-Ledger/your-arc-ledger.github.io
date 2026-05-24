@@ -14,7 +14,9 @@ export function useCategories() {
 
     readCategories(spreadsheetId, authState.accessToken)
       .then(setCategories)
-      .catch(() => undefined)
+      .catch((err: unknown) => {
+        console.error('Failed to load categories:', err)
+      })
   }, [authState.status, authState.accessToken])
 
   const addCategory = useCallback(async (name: string) => {

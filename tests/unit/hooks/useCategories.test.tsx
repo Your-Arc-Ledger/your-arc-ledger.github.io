@@ -104,6 +104,21 @@ describe('useCategories', () => {
     expect(result.current.categories).not.toContain('Temporary')
   })
 
+  it('logs an error when readCategories fails', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    vi.mocked(readCategories).mockRejectedValue(new Error('Network error'))
+
+    renderHook(() => useCategories(), { wrapper: makeWrapper(authorisedState) })
+
+    await waitFor(() => {
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('categories'),
+        expect.any(Error)
+      )
+    })
+    consoleSpy.mockRestore()
+  })
+
   it('addCategory does nothing when not authorised', async () => {
     const { result } = renderHook(() => useCategories(), {
       wrapper: makeWrapper(idleState),
