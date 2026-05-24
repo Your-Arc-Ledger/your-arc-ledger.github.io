@@ -30,7 +30,7 @@ function parseCategories(raw: string): string[] {
 function rowToEntry(row: string[]): Entry {
   return {
     id: row[0] ?? '',
-    type: (row[1] === 'lesson' ? 'lesson' : 'achievement') as Entry['type'],
+    type: (row[1] === 'setback' ? 'setback' : 'achievement') as Entry['type'],
     title: row[2] ?? '',
     description: row[3] ?? '',
     categories: parseCategories(row[4] ?? ''),

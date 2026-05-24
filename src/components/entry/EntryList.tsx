@@ -9,7 +9,7 @@ type Filter = EntriesState['filter']
 const FILTERS: { label: string; value: Filter }[] = [
   { label: 'All', value: 'all' },
   { label: 'Achievements', value: 'achievement' },
-  { label: 'Lessons', value: 'lesson' },
+  { label: 'Setbacks', value: 'setback' },
 ]
 
 export default function EntryList({ items: itemsProp, onEdit }: { items?: Entry[]; onEdit?: (entry: Entry) => void }) {
@@ -63,7 +63,7 @@ export default function EntryList({ items: itemsProp, onEdit }: { items?: Entry[
       {items.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           <p className="text-lg font-medium">No entries yet</p>
-          <p className="text-sm mt-1">Log your first achievement or lesson above.</p>
+          <p className="text-sm mt-1">Log your first achievement or setback above.</p>
         </div>
       ) : (
         items.map((entry) => <EntryCard key={entry.id} entry={entry} onEdit={onEdit ? () => onEdit(entry) : undefined} />)

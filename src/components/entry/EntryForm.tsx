@@ -66,7 +66,7 @@ export default function EntryForm({ onSubmit, initialValues, onCancel, submitLab
                   {...field}
                 >
                   <option value="achievement">Achievement</option>
-                  <option value="lesson">Lesson</option>
+                  <option value="setback">Setback</option>
                 </select>
               </FormControl>
               <FormMessage />

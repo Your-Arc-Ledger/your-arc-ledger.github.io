@@ -23,10 +23,10 @@ describe('EntriesContext filter reducer', () => {
   it('SET_FILTER achievement shows only achievements', () => {
     const { result } = renderHook(() => useEntriesContext(), { wrapper })
     const achievement = makeEntry({ type: 'achievement', title: 'Win' })
-    const lesson = makeEntry({ type: 'lesson', title: 'Loss' })
+    const setback = makeEntry({ type: 'setback', title: 'Loss' })
 
     act(() => {
-      result.current.dispatch({ type: 'SET_ENTRIES', payload: [achievement, lesson] })
+      result.current.dispatch({ type: 'SET_ENTRIES', payload: [achievement, setback] })
       result.current.dispatch({ type: 'SET_FILTER', payload: 'achievement' })
     })
 
@@ -34,12 +34,12 @@ describe('EntriesContext filter reducer', () => {
     expect(result.current.state.items).toHaveLength(2)
   })
 
-  it('SET_FILTER lesson works correctly', () => {
+  it('SET_FILTER setback works correctly', () => {
     const { result } = renderHook(() => useEntriesContext(), { wrapper })
     act(() => {
-      result.current.dispatch({ type: 'SET_FILTER', payload: 'lesson' })
+      result.current.dispatch({ type: 'SET_FILTER', payload: 'setback' })
     })
-    expect(result.current.state.filter).toBe('lesson')
+    expect(result.current.state.filter).toBe('setback')
   })
 
   it('SET_FILTER all restores full list', () => {
@@ -71,7 +71,7 @@ describe('EntriesContext filter reducer', () => {
 
   it('master items array is never mutated by SET_FILTER', () => {
     const { result } = renderHook(() => useEntriesContext(), { wrapper })
-    const items = [makeEntry({ type: 'achievement' }), makeEntry({ type: 'lesson' })]
+    const items = [makeEntry({ type: 'achievement' }), makeEntry({ type: 'setback' })]
 
     act(() => {
       result.current.dispatch({ type: 'SET_ENTRIES', payload: items })

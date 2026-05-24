@@ -18,7 +18,7 @@ describe('EntryList', () => {
   it('renders entries in reverse-chronological order', () => {
     const items = [
       { id: '1', type: 'achievement' as const, title: 'First', date: '2026-05-01', createdAt: '2026-05-01T10:00:00.000Z', description: '', categories: [] },
-      { id: '2', type: 'lesson' as const, title: 'Second', date: '2026-05-10', createdAt: '2026-05-10T10:00:00.000Z', description: '', categories: [] },
+      { id: '2', type: 'setback' as const, title: 'Second', date: '2026-05-10', createdAt: '2026-05-10T10:00:00.000Z', description: '', categories: [] },
     ]
     render(
       <EntriesProvider>

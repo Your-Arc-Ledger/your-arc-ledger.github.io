@@ -46,7 +46,7 @@ describe('useEntries', () => {
 
     await act(async () => {
       await result.current.addEntry({ type: 'achievement', title: 'Older', date: '2026-05-01', description: '', category: '' })
-      await result.current.addEntry({ type: 'lesson', title: 'Newer', date: '2026-05-23', description: '', category: '' })
+      await result.current.addEntry({ type: 'setback', title: 'Newer', date: '2026-05-23', description: '', category: '' })
     })
 
     expect(result.current.entries[0].title).toBe('Newer')

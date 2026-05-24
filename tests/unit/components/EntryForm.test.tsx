@@ -48,7 +48,7 @@ describe('EntryForm', () => {
   })
 
   it('pre-fills fields from initialValues', () => {
-    const initial: EntryFields = { type: 'lesson', title: 'Existing title', description: 'Some desc', categories: ['Work'], date: '2026-01-15' }
+    const initial: EntryFields = { type: 'setback', title: 'Existing title', description: 'Some desc', categories: ['Work'], date: '2026-01-15' }
     render(<EntryForm onSubmit={vi.fn()} initialValues={initial} />)
     expect(screen.getByLabelText(/title/i)).toHaveValue('Existing title')
     expect(screen.getByLabelText(/description/i)).toHaveValue('Some desc')
@@ -81,7 +81,7 @@ describe('EntryForm', () => {
     })
     const [fields] = onSubmit.mock.calls[0]
     expect(fields.title).toBe('My achievement')
-    expect(['achievement', 'lesson']).toContain(fields.type)
+    expect(['achievement', 'setback']).toContain(fields.type)
     expect(fields.date).toBeDefined()
   })
 })

@@ -18,7 +18,7 @@ const DATA_ROW: string[] = [
 
 const LEGACY_DATA_ROW: string[] = [
   'uuid-2',
-  'lesson',
+  'setback',
   'Legacy title',
   '',
   'OldCategory',
@@ -161,7 +161,7 @@ describe('appendEntry', () => {
 describe('updateEntry', () => {
   const entry: Entry = {
     id: 'uuid-1',
-    type: 'lesson',
+    type: 'setback',
     title: 'Updated title',
     description: 'Updated desc',
     categories: ['Health'],
