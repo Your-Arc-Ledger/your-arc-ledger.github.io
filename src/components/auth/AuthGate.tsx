@@ -2,15 +2,52 @@ import { type ReactNode, useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { useGoogleAuth } from '@/hooks/useGoogleAuth'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { initSheet } from '@/services/googleSheets'
 import { loadSheetRef, saveSheetRef } from '@/lib/storage'
 
-const SHEETS_URL_RE = /\/spreadsheets\/d\/([^/]+)/
+const GAPI_SRC = 'https://apis.google.com/js/api.js'
 
-function extractSpreadsheetId(url: string): string | null {
-  const match = SHEETS_URL_RE.exec(url)
-  return match ? match[1] : null
+function loadPickerApi(): Promise<void> {
+  if (window.gapi) return Promise.resolve()
+  return new Promise((resolve) => {
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${GAPI_SRC}"]`)
+    if (existing) {
+      existing.addEventListener('load', () => resolve(), { once: true })
+      return
+    }
+    const script = document.createElement('script')
+    script.src = GAPI_SRC
+    script.onload = () => resolve()
+    document.body.appendChild(script)
+  })
+}
+
+function openDrivePicker(accessToken: string): Promise<{ id: string; name: string } | null> {
+  const apiKey = import.meta.env.VITE_GOOGLE_API_KEY as string
+  return loadPickerApi().then(
+    () =>
+      new Promise((resolve) => {
+        window.gapi!.load('picker', () => {
+          new window.google!.picker!.PickerBuilder()
+            .setDeveloperKey(apiKey)
+            .setOAuthToken(accessToken)
+            .addView(
+              new window.google!.picker!.DocsView().setMimeTypes(
+                'application/vnd.google-apps.spreadsheet'
+              )
+            )
+            .setCallback((data) => {
+              if (data.action === 'picked' && data.docs?.[0]) {
+                resolve({ id: data.docs[0].id, name: data.docs[0].name })
+              } else if (data.action === 'cancel') {
+                resolve(null)
+              }
+            })
+            .build()
+            .setVisible(true)
+        })
+      })
+  )
 }
 
 interface SpreadsheetPickerProps {
@@ -19,15 +56,14 @@ interface SpreadsheetPickerProps {
 }
 
 function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) {
-  const [url, setUrl] = useState('')
-  const [urlError, setUrlError] = useState('')
   const [creating, setCreating] = useState(false)
-  const [connecting, setConnecting] = useState(false)
-  const [initError, setInitError] = useState('')
+  const [browsing, setBrowsing] = useState(false)
+  const [createError, setCreateError] = useState('')
+  const [connectError, setConnectError] = useState('')
 
   async function handleCreate() {
     setCreating(true)
-    setInitError('')
+    setCreateError('')
     try {
       const res = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
         method: 'POST',
@@ -50,36 +86,25 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
       saveSheetRef({ id: data.spreadsheetId, title: data.properties?.title ?? 'Arc Ledger' })
       onSelected(data.spreadsheetId)
     } catch (e) {
-      setInitError(e instanceof Error ? e.message : 'Failed to create spreadsheet')
+      setCreateError(e instanceof Error ? e.message : 'Failed to create spreadsheet')
     } finally {
       setCreating(false)
     }
   }
 
-  async function handleConnect() {
-    setUrlError('')
-    const id = extractSpreadsheetId(url)
-    if (!id) {
-      setUrlError(
-        'URL format not recognised. It should look like: https://docs.google.com/spreadsheets/d/{ID}/edit'
-      )
-      return
-    }
-    setConnecting(true)
+  async function handleBrowse() {
+    setBrowsing(true)
+    setConnectError('')
     try {
-      const res = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${id}?fields=properties.title`,
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      )
-      if (!res.ok) throw new Error(`Could not fetch spreadsheet (${res.status})`)
-      const meta = await res.json() as { properties?: { title?: string } }
-      await initSheet(id, accessToken)
-      saveSheetRef({ id, title: meta.properties?.title ?? 'your spreadsheet' })
-      onSelected(id)
+      const file = await openDrivePicker(accessToken)
+      if (!file) return
+      await initSheet(file.id, accessToken)
+      saveSheetRef({ id: file.id, title: file.name })
+      onSelected(file.id)
     } catch (e) {
-      setUrlError(e instanceof Error ? e.message : 'Failed to connect spreadsheet')
+      setConnectError(e instanceof Error ? e.message : 'Failed to connect spreadsheet')
     } finally {
-      setConnecting(false)
+      setBrowsing(false)
     }
   }
 
@@ -90,22 +115,14 @@ function SpreadsheetPicker({ accessToken, onSelected }: SpreadsheetPickerProps) 
         <Button onClick={handleCreate} disabled={creating}>
           {creating ? 'Creating…' : 'Create new spreadsheet'}
         </Button>
-        {initError && <p className="text-sm text-destructive">{initError}</p>}
+        {createError && <p className="text-sm text-destructive">{createError}</p>}
       </div>
       <div className="space-y-2">
-        <p className="font-medium">Returning? Enter your spreadsheet URL:</p>
-        <div className="flex gap-2">
-          <Input
-            aria-label="Spreadsheet URL"
-            placeholder="https://docs.google.com/spreadsheets/d/…"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-          <Button variant="outline" onClick={handleConnect} disabled={connecting}>
-            {connecting ? 'Connecting…' : 'Connect'}
-          </Button>
-        </div>
-        {urlError && <p className="text-sm text-destructive">{urlError}</p>}
+        <p className="font-medium">Returning? Pick your existing spreadsheet:</p>
+        <Button variant="outline" onClick={handleBrowse} disabled={browsing}>
+          {browsing ? 'Connecting…' : 'Browse Drive'}
+        </Button>
+        {connectError && <p className="text-sm text-destructive">{connectError}</p>}
       </div>
     </div>
   )

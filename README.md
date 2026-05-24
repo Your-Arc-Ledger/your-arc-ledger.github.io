@@ -4,11 +4,11 @@ A personal achievement and setback tracker. Logs entries to a Google Sheet in yo
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 22+
 - A Google account
-- A Google Cloud project with the Sheets API enabled and an OAuth 2.0 client ID configured
+- Two Google Cloud credentials — see [Google Cloud Setup](docs/google-cloud-setup.md)
 
-## Setup
+## Local development
 
 ### 1. Install dependencies
 
@@ -16,17 +16,16 @@ A personal achievement and setback tracker. Logs entries to a Google Sheet in yo
 npm install
 ```
 
-### 2. Configure Google OAuth
+### 2. Configure credentials
 
-Create a `.env.local` file in the project root:
+Copy `.env.example` to `.env` and fill in both values:
 
 ```env
-VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-VITE_SPREADSHEET_ID=your-google-sheet-id
+VITE_GOOGLE_CLIENT_ID=<your-oauth-client-id>.apps.googleusercontent.com
+VITE_GOOGLE_API_KEY=<your-api-key>
 ```
 
-- **Client ID**: from Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client ID (Web application type). Add `http://localhost:5173` to the Authorised JavaScript origins.
-- **Spreadsheet ID**: the ID from the URL of your Google Sheet (`https://docs.google.com/spreadsheets/d/<ID>/edit`). The sheet will be initialised with the correct columns on first run.
+See [docs/google-cloud-setup.md](docs/google-cloud-setup.md) for how to obtain these.
 
 ### 3. Start the development server
 
@@ -34,24 +33,27 @@ VITE_SPREADSHEET_ID=your-google-sheet-id
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+Open [http://localhost:5173](http://localhost:5173). On first run you will be prompted to sign in with Google and either create a new spreadsheet or pick an existing one from your Drive.
 
-## Available Commands
+## Commands
 
 | Command | Description |
-|---------|-------------|
+|---|---|
 | `npm run dev` | Start development server |
 | `npm run build` | Production build (output in `dist/`) |
 | `npm run preview` | Preview the production build locally |
 | `npm run lint` | Run ESLint |
 | `npm test` | Run tests in watch mode |
-| `npm run test:run` | Run tests once |
-| `npm run deploy` | Build and deploy to GitHub Pages |
+| `npm run test:run` | Run tests once (CI) |
 
 ## Deployment
 
-The app is deployed to GitHub Pages. Ensure the OAuth client ID's Authorised JavaScript origins includes your Pages URL before deploying.
+The app deploys to GitHub Pages via GitHub Actions on every push to `main`.
 
-```bash
-npm run deploy
-```
+Before the first deploy:
+
+1. Add `VITE_GOOGLE_CLIENT_ID` and `VITE_GOOGLE_API_KEY` as repository secrets (Settings → Secrets and variables → Actions → Secrets)
+2. Add your Pages URL (e.g. `https://<username>.github.io`) to the **Authorised JavaScript origins** of your OAuth client in Google Cloud Console
+3. Add the same origin to the HTTP referrer restrictions on your API key
+
+Subsequent deploys are automatic on push.

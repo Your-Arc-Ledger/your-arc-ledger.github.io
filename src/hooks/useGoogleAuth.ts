@@ -1,23 +1,7 @@
 import { useEffect, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        oauth2: {
-          initTokenClient(config: {
-            client_id: string
-            scope: string
-            callback: (response: { access_token?: string; expires_in?: number; error?: string }) => void
-          }): { requestAccessToken(cfg?: { prompt?: string }): void }
-        }
-      }
-    }
-  }
-}
-
-const SCOPE = 'https://www.googleapis.com/auth/spreadsheets'
+const SCOPE = 'https://www.googleapis.com/auth/drive.file'
 const GIS_SRC = 'https://accounts.google.com/gsi/client'
 const REFRESH_BUFFER_MS = 5 * 60 * 1000
 

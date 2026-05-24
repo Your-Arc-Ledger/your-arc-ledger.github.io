@@ -31,7 +31,7 @@ describe('useGoogleAuth — manual auth', () => {
 
     expect(mockInitTokenClient).toHaveBeenCalledWith(
       expect.objectContaining({
-        scope: expect.stringContaining('spreadsheets'),
+        scope: expect.stringContaining('drive.file'),
       })
     )
   })
