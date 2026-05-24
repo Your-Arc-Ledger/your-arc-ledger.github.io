@@ -156,18 +156,23 @@ export default function AuthGate({ children }: { children: ReactNode }) {
   if (state.status === 'restoring' || state.status === 'authorising') {
     return (
       <div className="max-w-md mx-auto mt-24 p-6 text-center space-y-4">
-        <h2 className="text-xl font-semibold">Arc</h2>
+        <h1 className="text-3xl font-bold tracking-tight">Arc</h1>
         <p className="text-muted-foreground">Reconnecting…</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-md mx-auto mt-24 p-6 text-center space-y-4">
-      <h2 className="text-xl font-semibold">Arc</h2>
+    <div className="max-w-md mx-auto mt-24 p-6 text-center space-y-6">
+      <div className="space-y-3">
+        <h1 className="text-3xl font-bold tracking-tight">Arc</h1>
+        <p className="text-lg text-foreground/80 leading-relaxed">
+          A place for your personal story. Your achievements, your setbacks, and the lessons that come with each.
+        </p>
+      </div>
 
       {state.status === 'error' ? (
-        <>
+        <div className="space-y-3">
           <p className="text-destructive">{state.error}</p>
           {sheetRef && (
             <p className="text-muted-foreground">
@@ -182,16 +187,16 @@ export default function AuthGate({ children }: { children: ReactNode }) {
           >
             Reconnect Google Account
           </Button>
-        </>
+        </div>
       ) : (
-        <>
-          <p className="text-muted-foreground">
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">
             Connect your Google account to save entries to your own spreadsheet.
           </p>
           <Button onClick={initiateAuth}>
             Connect Google Account
           </Button>
-        </>
+        </div>
       )}
     </div>
   )
