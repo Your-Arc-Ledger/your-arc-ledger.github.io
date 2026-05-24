@@ -16,6 +16,7 @@ type EntriesAction =
   | { type: 'SET_FILTER'; payload: EntriesState['filter'] }
   | { type: 'SET_SAVING' }
   | { type: 'SET_ERROR'; payload: string }
+  | { type: 'RESET' }
 
 const initialState: EntriesState = {
   status: 'idle',
@@ -50,6 +51,8 @@ function entriesReducer(state: EntriesState, action: EntriesAction): EntriesStat
       return { ...state, status: 'saving' }
     case 'SET_ERROR':
       return { ...state, status: 'error', error: action.payload }
+    case 'RESET':
+      return initialState
   }
 }
 

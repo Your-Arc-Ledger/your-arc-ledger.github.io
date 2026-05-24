@@ -55,6 +55,10 @@ export function saveSessionHint(hint: SessionHint): void {
   localStorage.setItem(SESSION_HINT_KEY, JSON.stringify(hint))
 }
 
+export function clearSheetRef(): void {
+  localStorage.removeItem(SHEET_REF_KEY)
+}
+
 export function clearSessionHint(): void {
   localStorage.removeItem(SESSION_HINT_KEY)
 }

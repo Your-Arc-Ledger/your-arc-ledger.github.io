@@ -7,6 +7,7 @@ import EntryForm from './components/entry/EntryForm'
 import EntryList from './components/entry/EntryList'
 import EntrySummary from './components/summary/EntrySummary'
 import AuthGate from './components/auth/AuthGate'
+import LogoutButton from './components/auth/LogoutButton'
 import type { Entry, EntryFields } from './models/entry'
 
 function AppContent() {
@@ -72,6 +73,9 @@ export default function App() {
       <EntriesProvider>
         <AuthGate>
           <AppContent />
+          <div className="fixed bottom-4 right-4 z-50">
+            <LogoutButton />
+          </div>
         </AuthGate>
       </EntriesProvider>
     </AuthProvider>
