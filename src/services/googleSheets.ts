@@ -39,9 +39,9 @@ function rowToEntry(row: string[]): Entry {
   }
 }
 
-export async function readEntries(spreadsheetId: string, accessToken: string): Promise<Entry[]> {
+export async function readEntries(spreadsheetId: string, accessToken: string, signal?: AbortSignal): Promise<Entry[]> {
   const url = `${BASE_URL}/${spreadsheetId}/values/${RANGE}`
-  const res = await fetch(url, { headers: authHeaders(accessToken) })
+  const res = await fetch(url, { headers: authHeaders(accessToken), signal })
   if (!res.ok) throw res
   const data = await res.json() as { values?: string[][] }
 

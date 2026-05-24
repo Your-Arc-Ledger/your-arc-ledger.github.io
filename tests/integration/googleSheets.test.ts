@@ -98,6 +98,22 @@ describe('readEntries', () => {
       })
     )
   })
+
+  it('forwards the AbortSignal to fetch when provided', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    })
+    vi.stubGlobal('fetch', mockFetch)
+
+    const controller = new AbortController()
+    await readEntries(SPREADSHEET_ID, ACCESS_TOKEN, controller.signal)
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ signal: controller.signal })
+    )
+  })
 })
 
 describe('appendEntry', () => {

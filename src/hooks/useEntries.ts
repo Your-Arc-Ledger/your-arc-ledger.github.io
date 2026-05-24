@@ -23,14 +23,18 @@ export function useEntries() {
     const spreadsheetId = loadSheetRef()?.id ?? null
     if (!spreadsheetId) return
 
+    const controller = new AbortController()
     dispatch({ type: 'SET_LOADING' })
 
-    readEntries(spreadsheetId, authState.accessToken)
+    readEntries(spreadsheetId, authState.accessToken, controller.signal)
       .then((entries) => dispatch({ type: 'SET_ENTRIES', payload: entries }))
       .catch((err: unknown) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return
         const msg = err instanceof Error ? err.message : 'Failed to load entries'
         dispatch({ type: 'SET_ERROR', payload: msg })
       })
+
+    return () => controller.abort()
   }, [authState.status, authState.accessToken, dispatch])
 
   const addEntry = useCallback(async (fields: EntryFields) => {
