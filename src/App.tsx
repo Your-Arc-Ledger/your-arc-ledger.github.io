@@ -44,9 +44,9 @@ function AppContent() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <section ref={formSectionRef}>
           <h2 className="text-lg font-medium mb-4">{editingEntry ? 'Edit Entry' : 'Log an Entry'}</h2>
-          <div className={editingEntry ? 'hidden' : ''}>
+          {!editingEntry && (
             <EntryForm onSubmit={handleSubmit} categories={categories} onAddCategory={addCategory} />
-          </div>
+          )}
           {editingEntry && (
             <EntryForm
               initialValues={editingEntry}
