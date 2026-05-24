@@ -42,6 +42,7 @@ function rowToEntry(row: string[]): Entry {
 export async function readEntries(spreadsheetId: string, accessToken: string): Promise<Entry[]> {
   const url = `${BASE_URL}/${spreadsheetId}/values/${RANGE}`
   const res = await fetch(url, { headers: authHeaders(accessToken) })
+  if (!res.ok) throw res
   const data = await res.json() as { values?: string[][] }
 
   if (!data.values || data.values.length <= 1) return []
@@ -107,6 +108,7 @@ export async function updateEntry(
 export async function readCategories(spreadsheetId: string, accessToken: string): Promise<string[]> {
   const url = `${BASE_URL}/${spreadsheetId}/values/${LOOKUPS_RANGE}`
   const res = await fetch(url, { headers: authHeaders(accessToken) })
+  if (!res.ok) throw res
   const data = await res.json() as { values?: string[][] }
   if (!data.values || data.values.length <= 1) return []
   return data.values
@@ -156,11 +158,12 @@ export async function initSheet(spreadsheetId: string, accessToken: string): Pro
   const meta = await metaRes.json() as { sheets: Array<{ properties: { title: string } }> }
   const titles = meta.sheets?.map((s) => s.properties.title) ?? []
 
-  if (!titles.includes(SHEET_NAME)) {
-    await ensureSheet(spreadsheetId, accessToken, SHEET_NAME, `${SHEET_NAME}!A1:G1`, HEADER)
-  }
-
-  if (!titles.includes(LOOKUPS_SHEET_NAME)) {
-    await ensureSheet(spreadsheetId, accessToken, LOOKUPS_SHEET_NAME, `${LOOKUPS_SHEET_NAME}!A1:B1`, LOOKUPS_HEADER)
-  }
+  await Promise.all([
+    titles.includes(SHEET_NAME)
+      ? null
+      : ensureSheet(spreadsheetId, accessToken, SHEET_NAME, `${SHEET_NAME}!A1:G1`, HEADER),
+    titles.includes(LOOKUPS_SHEET_NAME)
+      ? null
+      : ensureSheet(spreadsheetId, accessToken, LOOKUPS_SHEET_NAME, `${LOOKUPS_SHEET_NAME}!A1:B1`, LOOKUPS_HEADER),
+  ])
 }
